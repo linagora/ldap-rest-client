@@ -72,7 +72,9 @@ export class OrganizationsResource extends BaseResource {
    * });
    * ```
    */
-  checkAvailability = async (params: CheckAvailabilityParams): Promise<CheckAvailabilityResponse> => {
+  checkAvailability = async (
+    params: CheckAvailabilityParams
+  ): Promise<CheckAvailabilityResponse> => {
     const query = this.buildQueryString(params);
     return this.http.get(`/api/v1/organizations/check${query}`);
   };
@@ -98,7 +100,10 @@ export class OrganizationsResource extends BaseResource {
    * });
    * ```
    */
-  createAdmin = async (organizationId: string, data: CreateAdminRequest): Promise<{ success: true }> => {
+  createAdmin = async (
+    organizationId: string,
+    data: CreateAdminRequest
+  ): Promise<{ success: true }> => {
     return this.http.post(
       `/api/v1/organizations/${encodeURIComponent(organizationId)}/admin`,
       data
@@ -162,7 +167,10 @@ export class OrganizationsResource extends BaseResource {
    * });
    * ```
    */
-  update = async (organizationId: string, data: UpdateOrganizationRequest): Promise<{ success: true }> => {
+  update = async (
+    organizationId: string,
+    data: UpdateOrganizationRequest
+  ): Promise<{ success: true }> => {
     return this.http.patch(`/api/v1/organizations/${encodeURIComponent(organizationId)}`, data);
   };
 
@@ -190,7 +198,10 @@ export class OrganizationsResource extends BaseResource {
    * });
    * ```
    */
-  createUser = async (organizationId: string, data: CreateUserRequest): Promise<CreateB2BUserResponse> => {
+  createUser = async (
+    organizationId: string,
+    data: CreateUserRequest
+  ): Promise<CreateB2BUserResponse> => {
     return this.http.post(
       `/api/v1/organizations/${encodeURIComponent(organizationId)}/users`,
       data
@@ -328,7 +339,10 @@ export class OrganizationsResource extends BaseResource {
    * });
    * ```
    */
-  listUsers = async (organizationId: string, params?: ListUsersParams): Promise<ListUsersResponse> => {
+  listUsers = async (
+    organizationId: string,
+    params?: ListUsersParams
+  ): Promise<ListUsersResponse> => {
     const query = params ? this.buildQueryString(params) : '';
     return this.http.get(
       `/api/v1/organizations/${encodeURIComponent(organizationId)}/users${query}`

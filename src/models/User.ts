@@ -165,7 +165,17 @@ export interface UpdateUserRequest {
   company?: string;
   phone?: PhoneNumber[];
   address?: Address[];
-  [key: string]: string | number | boolean | null | undefined | UserName | EmailAddress[] | InstantMessaging[] | PhoneNumber[] | Address[];
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | null
+    | undefined
+    | UserName
+    | EmailAddress[]
+    | InstantMessaging[]
+    | PhoneNumber[]
+    | Address[];
 }
 
 /**
