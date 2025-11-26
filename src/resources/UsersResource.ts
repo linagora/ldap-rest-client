@@ -102,7 +102,9 @@ export class UsersResource extends BaseResource {
    *
    * ```
    */
-  checkAvailability = async (params: CheckAvailabilityParams): Promise<CheckAvailabilityResponse> => {
+  checkAvailability = async (
+    params: CheckAvailabilityParams
+  ): Promise<CheckAvailabilityResponse> => {
     const query = this.buildQueryString(params);
     return this.http.get(`/api/v1/users/check${query}`);
   };

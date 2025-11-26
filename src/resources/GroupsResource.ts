@@ -54,7 +54,10 @@ export class GroupsResource extends BaseResource {
    * });
    * ```
    */
-  create = async (organizationId: string, data: CreateGroupRequest): Promise<CreateGroupResponse> => {
+  create = async (
+    organizationId: string,
+    data: CreateGroupRequest
+  ): Promise<CreateGroupResponse> => {
     return this.http.post(
       `/api/v1/organizations/${encodeURIComponent(organizationId)}/groups`,
       data

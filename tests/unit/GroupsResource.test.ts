@@ -459,9 +459,9 @@ describe('GroupsResource', () => {
       const error = new Error('Network error');
       mockHttpClient.post.mockRejectedValue(error);
 
-      await expect(
-        groups.create('org_abc123', { name: 'engineering' })
-      ).rejects.toThrow('Network error');
+      await expect(groups.create('org_abc123', { name: 'engineering' })).rejects.toThrow(
+        'Network error'
+      );
     });
 
     it('should propagate errors from HTTP client on list', async () => {
@@ -482,9 +482,9 @@ describe('GroupsResource', () => {
       const error = new Error('Conflict');
       mockHttpClient.patch.mockRejectedValue(error);
 
-      await expect(
-        groups.update('org_abc123', 'grp_xyz789', { name: 'new-name' })
-      ).rejects.toThrow('Conflict');
+      await expect(groups.update('org_abc123', 'grp_xyz789', { name: 'new-name' })).rejects.toThrow(
+        'Conflict'
+      );
     });
 
     it('should propagate errors from HTTP client on delete', async () => {
@@ -507,9 +507,9 @@ describe('GroupsResource', () => {
       const error = new Error('Member not in group');
       mockHttpClient.delete.mockRejectedValue(error);
 
-      await expect(
-        groups.removeMember('org_abc123', 'grp_xyz789', 'bob.wilson')
-      ).rejects.toThrow('Member not in group');
+      await expect(groups.removeMember('org_abc123', 'grp_xyz789', 'bob.wilson')).rejects.toThrow(
+        'Member not in group'
+      );
     });
   });
 });
