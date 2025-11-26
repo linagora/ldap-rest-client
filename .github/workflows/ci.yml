@@ -138,3 +138,29 @@ jobs:
             exit 1
           fi
           echo "build outputs verified"
+
+  status-check:
+    name: Status Check
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [lint, typecheck, test, build]
+    steps:
+      - name: Check all jobs status
+        run: |
+          if [ "${{ needs.lint.result }}" != "success" ]; then
+            echo "Lint job failed"
+            exit 1
+          fi
+          if [ "${{ needs.typecheck.result }}" != "success" ]; then
+            echo "Type check job failed"
+            exit 1
+          fi
+          if [ "${{ needs.test.result }}" != "success" ]; then
+            echo "Test job failed"
+            exit 1
+          fi
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            echo "Build job failed"
+            exit 1
+          fi
+          echo "All jobs passed successfully"
