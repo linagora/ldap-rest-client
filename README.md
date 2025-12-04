@@ -66,6 +66,11 @@ client.organizations.createAdmin(orgId, { username, mail })
 client.organizations.list()
 client.organizations.get(orgId)
 client.organizations.update(orgId, updates)
+
+// Organization ownership management
+client.organizations.getOwner(orgId)
+client.organizations.setOwner(orgId, { username, mail })
+client.organizations.transferOwnership(orgId, { newOwnerUsername })
 ```
 
 ### B2B Users (within Organizations)
@@ -75,8 +80,10 @@ client.organizations.updateUser(orgId, userId, updates)
 client.organizations.disableUser(orgId, userId)
 client.organizations.deleteUser(orgId, userId)
 client.organizations.getUser(orgId, { by, value })
-client.organizations.listUsers(orgId, { page, limit, status, search })
+client.organizations.listUsers(orgId, { page, limit, status, search, sortBy, sortOrder })
 client.organizations.checkUserAvailability(orgId, { field, value })
+
+// User role management ('owner', 'admin', 'moderator', 'member')
 client.organizations.changeUserRole(orgId, userId, { role })
 ```
 
@@ -89,6 +96,45 @@ client.groups.update(orgId, groupId, updates)
 client.groups.delete(orgId, groupId)
 client.groups.addMembers(orgId, groupId, { usernames })
 client.groups.removeMember(orgId, groupId, userId)
+```
+
+## Configuration
+
+### Client Options
+
+```typescript
+const client = new LdapRestClient({
+  baseUrl: 'https://ldap-rest.example.com',
+  auth: {
+    type: 'hmac',
+    serviceId: 'my-service',
+    secret: 'your-secret-key-at-least-32-chars-long',
+  },
+  timeout: 30000, // Request timeout in milliseconds (default: 30000)
+  logger: {
+    // Optional tslog configuration for custom logging
+    minLevel: 'info',
+  },
+});
+```
+
+### Authentication Types
+
+**HMAC (Backend Services)**
+```typescript
+auth: {
+  type: 'hmac',
+  serviceId: 'registration-service',
+  secret: 'your-secret-key', // Minimum 32 characters recommended
+}
+```
+
+**Cookie (Browser/SSO)**
+```typescript
+auth: {
+  type: 'cookie', // Uses cookies set by authentication service
+}
+// Or omit auth entirely (defaults to cookie)
 ```
 
 ## Error Handling
