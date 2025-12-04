@@ -134,3 +134,16 @@ export interface TransferOwnershipRequest {
   /** Username of the new owner */
   newOwnerUsername: string;
 }
+
+/**
+ * Fields that can be used to search for organizations
+ */
+export type OrganizationSearchField = 'id' | 'domain';
+
+/**
+ * Parameters for checking availability of organization id or domain
+ */
+export interface CheckOrganizationAvailabilityParams extends Record<string, string> {
+  field: OrganizationSearchField;
+  value: string;
+}

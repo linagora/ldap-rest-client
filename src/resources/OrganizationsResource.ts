@@ -9,6 +9,7 @@ import type {
   GetOwnerResponse,
   SetOwnerRequest,
   TransferOwnershipRequest,
+  CheckOrganizationAvailabilityParams,
 } from '../models/Organization';
 import type {
   CheckAvailabilityParams,
@@ -63,7 +64,7 @@ export class OrganizationsResource extends BaseResource {
   /**
    * Checks if an organization identifier is available
    *
-   * @param {CheckAvailabilityParams} params - Field and value to check
+   * @param {CheckOrganizationAvailabilityParams} params - Field and value to check
    * @returns {Promise<CheckAvailabilityResponse>} Availability status
    * @throws {ApiError} On API errors
    *
@@ -76,7 +77,7 @@ export class OrganizationsResource extends BaseResource {
    * ```
    */
   checkAvailability = async (
-    params: CheckAvailabilityParams
+    params: CheckOrganizationAvailabilityParams
   ): Promise<CheckAvailabilityResponse> => {
     const query = this.buildQueryString(params);
     return this.http.get(`/api/v1/organizations/check${query}`);
