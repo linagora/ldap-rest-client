@@ -1,6 +1,6 @@
 {
   "name": "@linagora/ldap-rest-client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TypeScript API client for LDAP-REST",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -44,8 +44,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/linagora/twake-workplace-private.git",
-    "directory": "ldap-rest-client"
+    "url": "https://github.com/linagora/ldap-rest-client.git"
   },
   "devDependencies": {
     "@types/jest": "^29.5.11",
