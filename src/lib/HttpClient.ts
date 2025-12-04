@@ -31,6 +31,7 @@ export interface RequestOptions {
  *
  * Handles all HTTP communication with the LDAP-REST API including:
  * - Optional HMAC authentication or cookie-based SSO
+ * - Automatic redirect following for SSO flows
  * - Error mapping and handling
  * - Request timeouts
  *
@@ -99,6 +100,7 @@ export class HttpClient {
         body: bodyString,
         signal: controller.signal,
         credentials: authHeader ? undefined : 'include',
+        redirect: 'follow',
       });
 
       clearTimeout(timeoutId);
