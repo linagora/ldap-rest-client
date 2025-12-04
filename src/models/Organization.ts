@@ -87,7 +87,7 @@ export interface UpdateOrganizationRequest {
 /**
  * User role within an organization
  */
-export type OrganizationRole = 'admin' | 'moderator' | 'member';
+export type OrganizationRole = 'owner' | 'admin' | 'moderator' | 'member';
 
 /**
  * Request parameters for changing a user's role in an organization
@@ -95,4 +95,42 @@ export type OrganizationRole = 'admin' | 'moderator' | 'member';
 export interface ChangeUserRoleRequest {
   /** New role for the user */
   role: OrganizationRole;
+}
+
+/**
+ * Organization owner information
+ */
+export interface OrganizationOwner {
+  /** Owner username */
+  username: string;
+  /** Owner email address */
+  mail?: string;
+  /** Owner display name */
+  displayName?: string;
+}
+
+/**
+ * Response from getting organization owner
+ */
+export interface GetOwnerResponse {
+  /** Current owner (null if no owner set) */
+  owner: OrganizationOwner | null;
+}
+
+/**
+ * Request parameters for setting organization owner
+ */
+export interface SetOwnerRequest {
+  /** Username of the user to set as owner */
+  username: string;
+  /** Email address of the user */
+  mail: string;
+}
+
+/**
+ * Request parameters for transferring organization ownership
+ */
+export interface TransferOwnershipRequest {
+  /** Username of the new owner */
+  newOwnerUsername: string;
 }
