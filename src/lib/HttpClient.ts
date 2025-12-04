@@ -81,6 +81,7 @@ export class HttpClient {
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      Accept: 'application/json',
       ...options.headers,
     };
 
