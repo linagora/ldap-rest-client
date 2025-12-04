@@ -6,6 +6,9 @@ import type {
   Organization,
   UpdateOrganizationRequest,
   ChangeUserRoleRequest,
+  GetOwnerResponse,
+  SetOwnerRequest,
+  TransferOwnershipRequest,
 } from '../models/Organization';
 import type {
   CheckAvailabilityParams,
@@ -172,6 +175,108 @@ export class OrganizationsResource extends BaseResource {
     data: UpdateOrganizationRequest
   ): Promise<{ success: true }> => {
     return this.http.patch(`/api/v1/organizations/${encodeURIComponent(organizationId)}`, data);
+  };
+
+  /**
+   * Gets the current owner of an organization
+   *
+   * Returns the owner information including username, email, and display name.
+   * Returns null if no owner is set.
+   *
+   * @param {string} organizationId - Organization identifier
+   * @returns {Promise<GetOwnerResponse>} Owner information or null
+   * @throws {NotFoundError} When organization is not found
+   * @throws {ApiError} On other API errors
+   *
+   * @example
+   * ```typescript
+   * const response = await client.organizations.getOwner('org_abc123');
+   * if (response.owner) {
+   *   console.log(`Owner: ${response.owner.username}`);
+   * }
+   * ```
+   */
+  getOwner = async (organizationId: string): Promise<GetOwnerResponse> => {
+    return this.http.get(`/api/v1/organizations/${encodeURIComponent(organizationId)}/owner`);
+  };
+
+  /**
+   * Sets the initial owner of an organization
+   *
+   * Can only be used when the organization has no owner. To transfer ownership
+   * from an existing owner, use transferOwnership instead.
+   * Typically used by SaaS tools during organization setup.
+   *
+   * @param {string} organizationId - Organization identifier
+   * @param {SetOwnerRequest} data - Owner details (username and email)
+   * @returns {Promise<{ success: true }>} Success response
+   * @throws {NotFoundError} When organization or user is not found
+   * @throws {ConflictError} When organization already has an owner
+   * @throws {ApiError} On other API errors
+   *
+   * @example
+   * ```typescript
+   * await client.organizations.setOwner('org_abc123', {
+   *   username: 'john.doe',
+   *   mail: 'john.doe@acme.example.com'
+   * });
+   * ```
+   */
+  setOwner = async (organizationId: string, data: SetOwnerRequest): Promise<{ success: true }> => {
+    return this.http.post(
+      `/api/v1/organizations/${encodeURIComponent(organizationId)}/owner`,
+      data
+    );
+  };
+
+  /**
+   * Transfers organization ownership to another user
+   *
+   * Must be called by the current owner or by SaaS tools (with HMAC auth).
+   * The current owner will be demoted to admin role.
+   * The new owner must be an existing user.
+   *
+   * @param {string} organizationId - Organization identifier
+   * @param {TransferOwnershipRequest} data - New owner username
+   * @returns {Promise<{ success: true }>} Success response
+   * @throws {NotFoundError} When organization or new owner user is not found
+   * @throws {ForbiddenError} When caller is not the current owner or SaaS tool
+   * @throws {ConflictError} When ownership changed by another request (race condition)
+   * @throws {ApiError} On other API errors
+   *
+   * @example
+   * ```typescript
+   * await client.organizations.transferOwnership('org_abc123', {
+   *   newOwnerUsername: 'jane.doe'
+   * });
+   * ```
+   */
+  transferOwnership = async (
+    organizationId: string,
+    data: TransferOwnershipRequest
+  ): Promise<{ success: true }> => {
+    return this.http.put(`/api/v1/organizations/${encodeURIComponent(organizationId)}/owner`, data);
+  };
+
+  /**
+   * Deletes an organization
+   *
+   * Permanently removes the organization and all its data.
+   * Can only be called by the organization owner or SaaS tools (with HMAC auth).
+   *
+   * @param {string} organizationId - Organization identifier
+   * @returns {Promise<{ success: true }>} Success response
+   * @throws {NotFoundError} When organization is not found
+   * @throws {ForbiddenError} When caller is not the organization owner
+   * @throws {ApiError} On other API errors
+   *
+   * @example
+   * ```typescript
+   * await client.organizations.delete('org_abc123');
+   * ```
+   */
+  delete = async (organizationId: string): Promise<{ success: true }> => {
+    return this.http.delete(`/api/v1/organizations/${encodeURIComponent(organizationId)}`);
   };
 
   // ===== B2B User Management Methods =====

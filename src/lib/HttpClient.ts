@@ -17,7 +17,7 @@ import {
  */
 export interface RequestOptions {
   /** HTTP method */
-  method: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   /** Request path (relative to base URL) */
   path: string;
   /** Request body (will be JSON stringified) */
@@ -223,6 +223,19 @@ export class HttpClient {
    */
   post = <T>(path: string, body?: unknown, headers?: Record<string, string>): Promise<T> => {
     return this.request<T>({ method: 'POST', path, body, headers });
+  };
+
+  /**
+   * Performs a PUT request
+   *
+   * @template T - Response type
+   * @param {string} path - Request path
+   * @param {unknown} [body] - Request body
+   * @param {Record<string, string>} [headers] - Additional headers
+   * @returns {Promise<T>} Parsed response body
+   */
+  put = <T>(path: string, body?: unknown, headers?: Record<string, string>): Promise<T> => {
+    return this.request<T>({ method: 'PUT', path, body, headers });
   };
 
   /**
