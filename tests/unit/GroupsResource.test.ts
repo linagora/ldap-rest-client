@@ -3,7 +3,6 @@ import { HttpClient } from '../../src/lib/HttpClient';
 import type {
   Group,
   CreateGroupRequest,
-  CreateGroupResponse,
   UpdateGroupRequest,
   AddGroupMembersRequest,
   ListGroupsResponse,
@@ -36,17 +35,14 @@ describe('GroupsResource', () => {
         description: 'Engineering team',
       };
 
-      const response: CreateGroupResponse = {
-        success: true,
-        group: {
-          id: 'grp_xyz789',
-          cn: 'engineering',
-          description: 'Engineering team',
-          organizationId: 'org_abc123',
-          baseDN: 'cn=engineering,o=acme-corp,dc=example,dc=com',
-          members: [],
-          createdAt: '2025-01-23T11:00:00Z',
-        },
+      const response: Group = {
+        id: 'grp_xyz789',
+        cn: 'engineering',
+        description: 'Engineering team',
+        organizationId: 'org_abc123',
+        baseDN: 'cn=engineering,o=acme-corp,dc=example,dc=com',
+        members: [],
+        createdAt: '2025-01-23T11:00:00Z',
       };
 
       mockHttpClient.post.mockResolvedValue(response);
@@ -65,16 +61,13 @@ describe('GroupsResource', () => {
         name: 'sales',
       };
 
-      const response: CreateGroupResponse = {
-        success: true,
-        group: {
-          id: 'grp_abc456',
-          cn: 'sales',
-          organizationId: 'org_abc123',
-          baseDN: 'cn=sales,o=acme-corp,dc=example,dc=com',
-          members: [],
-          createdAt: '2025-01-23T11:00:00Z',
-        },
+      const response: Group = {
+        id: 'grp_abc456',
+        cn: 'sales',
+        organizationId: 'org_abc123',
+        baseDN: 'cn=sales,o=acme-corp,dc=example,dc=com',
+        members: [],
+        createdAt: '2025-01-23T11:00:00Z',
       };
 
       mockHttpClient.post.mockResolvedValue(response);
@@ -94,17 +87,14 @@ describe('GroupsResource', () => {
         description: 'Engineering team',
       };
 
-      const response: CreateGroupResponse = {
-        success: true,
-        group: {
-          id: 'grp_xyz789',
-          cn: 'engineering',
-          description: 'Engineering team',
-          organizationId: 'org_abc+123',
-          baseDN: 'cn=engineering,o=acme-corp,dc=example,dc=com',
-          members: [],
-          createdAt: '2025-01-23T11:00:00Z',
-        },
+      const response: Group = {
+        id: 'grp_xyz789',
+        cn: 'engineering',
+        description: 'Engineering team',
+        organizationId: 'org_abc+123',
+        baseDN: 'cn=engineering,o=acme-corp,dc=example,dc=com',
+        members: [],
+        createdAt: '2025-01-23T11:00:00Z',
       };
 
       mockHttpClient.post.mockResolvedValue(response);
@@ -386,7 +376,7 @@ describe('GroupsResource', () => {
   describe('URL encoding', () => {
     it('should properly encode organization IDs in all methods', async () => {
       const orgId = 'org with spaces';
-      mockHttpClient.post.mockResolvedValue({ success: true, group: {} as Group });
+      mockHttpClient.post.mockResolvedValue({} as Group);
       mockHttpClient.get.mockResolvedValue({});
       mockHttpClient.patch.mockResolvedValue({ success: true });
       mockHttpClient.delete.mockResolvedValue({ success: true });

@@ -20,7 +20,6 @@ import type {
   FetchUserRequest,
   ListUsersParams,
   ListUsersResponse,
-  CreateB2BUserResponse,
 } from '../models/User';
 
 /**
@@ -289,7 +288,7 @@ export class OrganizationsResource extends BaseResource {
    *
    * @param {string} organizationId - Organization identifier
    * @param {CreateUserRequest} data - User data including credentials and profile
-   * @returns {Promise<CreateB2BUserResponse>} Response with user's baseDN
+   * @returns {Promise<User>} The created user object
    * @throws {ForbiddenError} When user lacks admin privileges
    * @throws {NotFoundError} When organization is not found
    * @throws {ConflictError} When username/email/phone already exists
@@ -297,17 +296,14 @@ export class OrganizationsResource extends BaseResource {
    *
    * @example
    * ```typescript
-   * const result = await client.organizations.createUser('org_abc123', {
+   * const user = await client.organizations.createUser('org_abc123', {
    *   cn: 'john.doe',
    *   uid: 'john.doe',
    *   // ... other user fields
    * });
    * ```
    */
-  createUser = async (
-    organizationId: string,
-    data: CreateUserRequest
-  ): Promise<CreateB2BUserResponse> => {
+  createUser = async (organizationId: string, data: CreateUserRequest): Promise<User> => {
     return this.http.post(
       `/api/v1/organizations/${encodeURIComponent(organizationId)}/users`,
       data
@@ -322,14 +318,14 @@ export class OrganizationsResource extends BaseResource {
    * @param {string} organizationId - Organization identifier
    * @param {string} userId - User identifier (username)
    * @param {UpdateUserRequest} data - Fields to update
-   * @returns {Promise<{ success: true }>} Success response
+   * @returns {Promise<User | { success: true }>} Updated user object or success response
    * @throws {NotFoundError} When user or organization is not found
    * @throws {ForbiddenError} When user lacks admin privileges
    * @throws {ApiError} On other API errors
    *
    * @example
    * ```typescript
-   * await client.organizations.updateUser('org_abc123', 'john.doe', {
+   * const result = await client.organizations.updateUser('org_abc123', 'john.doe', {
    *   mobile: '+33687654321'
    * });
    * ```
@@ -338,7 +334,7 @@ export class OrganizationsResource extends BaseResource {
     organizationId: string,
     userId: string,
     data: UpdateUserRequest
-  ): Promise<{ success: true }> => {
+  ): Promise<User | { success: true }> => {
     return this.http.patch(
       `/api/v1/organizations/${encodeURIComponent(organizationId)}/users/${encodeURIComponent(userId)}`,
       data

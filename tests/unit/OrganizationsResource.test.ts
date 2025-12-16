@@ -12,7 +12,6 @@ import type {
   CreateUserRequest,
   UpdateUserRequest,
   ListUsersResponse,
-  CreateB2BUserResponse,
 } from '../../src/models/User';
 
 describe('OrganizationsResource', () => {
@@ -184,8 +183,24 @@ describe('OrganizationsResource', () => {
           protectedKey: 'protkey',
         };
 
-        const response: CreateB2BUserResponse = {
-          baseDN: 'uid=john.doe,o=acme-corp,dc=example,dc=com',
+        const response: User = {
+          cn: 'john.doe',
+          sn: 'Doe',
+          givenName: 'John',
+          displayName: 'John Doe',
+          mail: 'john.doe@acme.example.com',
+          mobile: '+33612345678',
+          userPassword: '$2a$10$...',
+          scryptN: 16384,
+          scryptP: 1,
+          scryptR: 8,
+          scryptSalt: 'salt123',
+          scryptDKLength: 64,
+          iterations: 10000,
+          domain: 'acme.example.com',
+          publicKey: 'pubkey',
+          privateKey: 'privkey',
+          protectedKey: 'protkey',
         };
         mockHttpClient.post.mockResolvedValue(response);
 
@@ -200,11 +215,29 @@ describe('OrganizationsResource', () => {
     });
 
     describe('updateUser', () => {
-      it('should update user in organization', async () => {
+      it('should update user in organization and return updated user', async () => {
         const updates: UpdateUserRequest = {
           mobile: '+33687654321',
         };
-        const response = { success: true };
+        const response: User = {
+          cn: 'john.doe',
+          sn: 'Doe',
+          givenName: 'John',
+          displayName: 'John Doe',
+          mail: 'john.doe@acme.example.com',
+          mobile: '+33687654321',
+          userPassword: '$2a$10$...',
+          scryptN: 16384,
+          scryptP: 1,
+          scryptR: 8,
+          scryptSalt: 'salt123',
+          scryptDKLength: 64,
+          iterations: 10000,
+          domain: 'acme.example.com',
+          publicKey: 'pubkey',
+          privateKey: 'privkey',
+          protectedKey: 'protkey',
+        };
         mockHttpClient.patch.mockResolvedValue(response);
 
         const result = await organizations.updateUser('org_abc123', 'john.doe', updates);
@@ -213,6 +246,16 @@ describe('OrganizationsResource', () => {
           '/api/v1/organizations/org_abc123/users/john.doe',
           updates
         );
+        expect(result).toEqual(response);
+      });
+
+      it('should return success response when user update succeeds without user data', async () => {
+        const updates: UpdateUserRequest = { mobile: '+33687654321' };
+        const response = { success: true };
+        mockHttpClient.patch.mockResolvedValue(response);
+
+        const result = await organizations.updateUser('org_abc123', 'john.doe', updates);
+
         expect(result).toEqual(response);
       });
 
