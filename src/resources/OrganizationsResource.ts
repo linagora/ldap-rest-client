@@ -303,10 +303,7 @@ export class OrganizationsResource extends BaseResource {
    * });
    * ```
    */
-  createUser = async (
-    organizationId: string,
-    data: CreateUserRequest
-  ): Promise<User> => {
+  createUser = async (organizationId: string, data: CreateUserRequest): Promise<User> => {
     return this.http.post(
       `/api/v1/organizations/${encodeURIComponent(organizationId)}/users`,
       data
