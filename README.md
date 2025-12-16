@@ -38,8 +38,8 @@ const client = new LdapRestClient({
   baseUrl: 'https://ldap-rest.example.com',
 });
 
-// Manage users in organization (returns User object)
-const user = await client.organizations.createUser(orgId, userData);
+// Manage users in organization (returns baseDN)
+const { baseDN } = await client.organizations.createUser(orgId, userData);
 await client.organizations.listUsers(orgId, { page: 1, limit: 20 });
 
 // Manage groups (returns Group object)
@@ -79,8 +79,8 @@ client.organizations.transferOwnership(orgId, { newOwnerUsername })
 
 ### B2B Users (within Organizations)
 ```typescript
-// Returns User object directly
-const user = await client.organizations.createUser(orgId, userData)
+// Returns baseDN of created user
+const { baseDN } = await client.organizations.createUser(orgId, userData)
 
 // Returns User object or { success: true }
 const result = await client.organizations.updateUser(orgId, userId, updates)

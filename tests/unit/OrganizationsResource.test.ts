@@ -12,6 +12,7 @@ import type {
   CreateUserRequest,
   UpdateUserRequest,
   ListUsersResponse,
+  CreateB2BUserResponse,
 } from '../../src/models/User';
 
 describe('OrganizationsResource', () => {
@@ -183,24 +184,8 @@ describe('OrganizationsResource', () => {
           protectedKey: 'protkey',
         };
 
-        const response: User = {
-          cn: 'john.doe',
-          sn: 'Doe',
-          givenName: 'John',
-          displayName: 'John Doe',
-          mail: 'john.doe@acme.example.com',
-          mobile: '+33612345678',
-          userPassword: '$2a$10$...',
-          scryptN: 16384,
-          scryptP: 1,
-          scryptR: 8,
-          scryptSalt: 'salt123',
-          scryptDKLength: 64,
-          iterations: 10000,
-          domain: 'acme.example.com',
-          publicKey: 'pubkey',
-          privateKey: 'privkey',
-          protectedKey: 'protkey',
+        const response: CreateB2BUserResponse = {
+          baseDN: 'uid=john.doe,o=acme-corp,dc=example,dc=com',
         };
         mockHttpClient.post.mockResolvedValue(response);
 

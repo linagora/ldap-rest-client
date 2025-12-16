@@ -20,6 +20,7 @@ import type {
   FetchUserRequest,
   ListUsersParams,
   ListUsersResponse,
+  CreateB2BUserResponse,
 } from '../models/User';
 
 /**
@@ -288,7 +289,7 @@ export class OrganizationsResource extends BaseResource {
    *
    * @param {string} organizationId - Organization identifier
    * @param {CreateUserRequest} data - User data including credentials and profile
-   * @returns {Promise<User>} The created user object
+   * @returns {Promise<CreateB2BUserResponse>} Response with user's baseDN
    * @throws {ForbiddenError} When user lacks admin privileges
    * @throws {NotFoundError} When organization is not found
    * @throws {ConflictError} When username/email/phone already exists
@@ -296,14 +297,17 @@ export class OrganizationsResource extends BaseResource {
    *
    * @example
    * ```typescript
-   * const user = await client.organizations.createUser('org_abc123', {
+   * const result = await client.organizations.createUser('org_abc123', {
    *   cn: 'john.doe',
    *   uid: 'john.doe',
    *   // ... other user fields
    * });
    * ```
    */
-  createUser = async (organizationId: string, data: CreateUserRequest): Promise<User> => {
+  createUser = async (
+    organizationId: string,
+    data: CreateUserRequest
+  ): Promise<CreateB2BUserResponse> => {
     return this.http.post(
       `/api/v1/organizations/${encodeURIComponent(organizationId)}/users`,
       data
