@@ -7,6 +7,7 @@ import type {
   CheckAvailabilityParams,
   CheckAvailabilityResponse,
 } from '../models';
+import type { Organization } from '../models/Organization';
 
 /**
  * Users resource - Manages B2C users in main LDAP branch
@@ -129,5 +130,30 @@ export class UsersResource extends BaseResource {
   fetch = async (params: FetchUserRequest): Promise<User> => {
     const query = this.buildQueryString(params);
     return this.http.get(`/api/v1/users${query}`);
+  };
+
+  /**
+   * Gets organizations where a user has a role
+   *
+   * Returns organizations where the user is an admin or owner.
+   * Optionally filter by specific role.
+   *
+   * @param {string} userId - User identifier (username)
+   * @param {string} [role] - Optional role filter ('owner', 'admin', 'moderator', 'member')
+   * @returns {Promise<Organization[]>} Array of organizations
+   * @throws {ApiError} On API errors
+   *
+   * @example
+   * ```typescript
+   * // Get all organizations where user has any role
+   * const orgs = await client.users.getUserOrganizations('johndoe');
+   *
+   * // Get only organizations where user is owner
+   * const ownedOrgs = await client.users.getUserOrganizations('johndoe', 'owner');
+   * ```
+   */
+  getUserOrganizations = async (userId: string, role?: string): Promise<Organization[]> => {
+    const query = role ? this.buildQueryString({ role }) : '';
+    return this.http.get(`/api/v1/users/${encodeURIComponent(userId)}/organizations${query}`);
   };
 }
