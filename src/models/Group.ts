@@ -32,14 +32,6 @@ export interface CreateGroupRequest {
 }
 
 /**
- * Response from creating a group
- */
-export interface CreateGroupResponse {
-  success: true;
-  group: Group;
-}
-
-/**
  * Request parameters for updating a group
  */
 export interface UpdateGroupRequest {

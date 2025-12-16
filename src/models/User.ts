@@ -365,11 +365,3 @@ export interface ListUsersResponse {
     hasPreviousPage: boolean;
   };
 }
-
-/**
- * Response from creating a B2B user in an organization
- */
-export interface CreateB2BUserResponse {
-  /** Base DN of the created user */
-  baseDN: string;
-}
