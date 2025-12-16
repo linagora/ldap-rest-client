@@ -124,6 +124,8 @@ export interface UserName {
  * Complete user model with all profile fields, credentials, and encryption keys
  */
 export interface User {
+  /** Unique user identifier (mapped from LDAP entryUUID) */
+  _id?: string;
   /** Common name (username) */
   cn: string;
   /** Surname or last name */
