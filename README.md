@@ -38,13 +38,16 @@ const client = new LdapRestClient({
   baseUrl: 'https://ldap-rest.example.com',
 });
 
-// Manage users in organization
-await client.organizations.createUser(orgId, userData);
+// Manage users in organization (returns User object)
+const user = await client.organizations.createUser(orgId, userData);
 await client.organizations.listUsers(orgId, { page: 1, limit: 20 });
 
-// Manage groups
-await client.groups.create(orgId, { name: 'engineering' });
+// Manage groups (returns Group object)
+const group = await client.groups.create(orgId, { name: 'engineering' });
 await client.groups.addMembers(orgId, groupId, { usernames: ['user1'] });
+
+// Get user's organizations
+const orgs = await client.users.getUserOrganizations(userId, 'admin');
 ```
 
 ## API Reference
@@ -57,6 +60,7 @@ client.users.disable(username)
 client.users.delete(username)
 client.users.checkAvailability({ field, value })
 client.users.fetch({ by, value, fields })
+client.users.getUserOrganizations(userId, role?) // Get user's organizations by role
 ```
 
 ### Organizations
@@ -75,8 +79,12 @@ client.organizations.transferOwnership(orgId, { newOwnerUsername })
 
 ### B2B Users (within Organizations)
 ```typescript
-client.organizations.createUser(orgId, userData)
-client.organizations.updateUser(orgId, userId, updates)
+// Returns User object directly
+const user = await client.organizations.createUser(orgId, userData)
+
+// Returns User object or { success: true }
+const result = await client.organizations.updateUser(orgId, userId, updates)
+
 client.organizations.disableUser(orgId, userId)
 client.organizations.deleteUser(orgId, userId)
 client.organizations.getUser(orgId, { by, value })
@@ -89,7 +97,9 @@ client.organizations.changeUserRole(orgId, userId, { role })
 
 ### Groups
 ```typescript
-client.groups.create(orgId, { name, description })
+// Returns Group object directly
+const group = await client.groups.create(orgId, { name, description })
+
 client.groups.list(orgId, { page, limit })
 client.groups.get(orgId, groupId)
 client.groups.update(orgId, groupId, updates)
