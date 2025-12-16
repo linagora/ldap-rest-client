@@ -2,7 +2,6 @@ import { BaseResource } from './BaseResource';
 import type {
   Group,
   CreateGroupRequest,
-  CreateGroupResponse,
   UpdateGroupRequest,
   AddGroupMembersRequest,
   ListGroupsParams,
@@ -40,7 +39,7 @@ export class GroupsResource extends BaseResource {
    *
    * @param {string} organizationId - Organization identifier
    * @param {CreateGroupRequest} data - Group data (name and optional description)
-   * @returns {Promise<CreateGroupResponse>} Created group details
+   * @returns {Promise<Group>} Created group object
    * @throws {ForbiddenError} When user lacks admin privileges
    * @throws {NotFoundError} When organization is not found
    * @throws {ConflictError} When group name already exists
@@ -48,7 +47,7 @@ export class GroupsResource extends BaseResource {
    *
    * @examples
    * ```typescript
-   * const result = await client.groups.create('org_abc123', {
+   * const group = await client.groups.create('org_abc123', {
    *   name: 'engineering',
    *   description: 'Engineering team'
    * });
@@ -57,7 +56,7 @@ export class GroupsResource extends BaseResource {
   create = async (
     organizationId: string,
     data: CreateGroupRequest
-  ): Promise<CreateGroupResponse> => {
+  ): Promise<Group> => {
     return this.http.post(
       `/api/v1/organizations/${encodeURIComponent(organizationId)}/groups`,
       data
