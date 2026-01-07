@@ -289,7 +289,7 @@ export class OrganizationsResource extends BaseResource {
    *
    * @param {string} organizationId - Organization identifier
    * @param {CreateUserRequest} data - User data including credentials and profile
-   * @returns {Promise<CreateB2BUserResponse>} Response with user's baseDN
+   * @returns {Promise<CreateB2BUserResponse>} The created user object with all fields populated
    * @throws {ForbiddenError} When user lacks admin privileges
    * @throws {NotFoundError} When organization is not found
    * @throws {ConflictError} When username/email/phone already exists
@@ -297,11 +297,12 @@ export class OrganizationsResource extends BaseResource {
    *
    * @example
    * ```typescript
-   * const result = await client.organizations.createUser('org_abc123', {
+   * const user = await client.organizations.createUser('org_abc123', {
    *   cn: 'john.doe',
    *   uid: 'john.doe',
    *   // ... other user fields
    * });
+   * console.log(user._id); // Access the user's unique identifier
    * ```
    */
   createUser = async (
@@ -322,16 +323,17 @@ export class OrganizationsResource extends BaseResource {
    * @param {string} organizationId - Organization identifier
    * @param {string} userId - User identifier (username)
    * @param {UpdateUserRequest} data - Fields to update
-   * @returns {Promise<User | { success: true }>} Updated user object or success response
+   * @returns {Promise<User | { success: true }>} The updated user object with all fields populated
    * @throws {NotFoundError} When user or organization is not found
    * @throws {ForbiddenError} When user lacks admin privileges
    * @throws {ApiError} On other API errors
    *
    * @example
    * ```typescript
-   * const result = await client.organizations.updateUser('org_abc123', 'john.doe', {
+   * const user = await client.organizations.updateUser('org_abc123', 'john.doe', {
    *   mobile: '+33687654321'
    * });
+   * console.log(user); // Access the updated user object
    * ```
    */
   updateUser = async (
