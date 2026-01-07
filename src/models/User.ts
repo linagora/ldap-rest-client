@@ -168,6 +168,8 @@ export interface User {
   recoveryEmail?: string;
   /** Timestamp when password account was locked */
   pwdAccountLockedTime?: string;
+  /** Organization ID for B2B users */
+  organizationId?: string;
   /** User's role in Twake organization ('owner', 'admin', 'moderator', 'member') */
   twakeOrganizationRole?: string;
   /** Full name as a single string */
@@ -370,8 +372,6 @@ export interface ListUsersResponse {
 
 /**
  * Response from creating a B2B user in an organization
+ * Returns the full user object with all fields populated
  */
-export interface CreateB2BUserResponse {
-  /** Base DN of the created user */
-  baseDN: string;
-}
+export type CreateB2BUserResponse = User;
