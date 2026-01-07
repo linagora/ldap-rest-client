@@ -162,7 +162,7 @@ describe('OrganizationsResource', () => {
 
   describe('B2B User Management', () => {
     describe('createUser', () => {
-      it('should create user in organization', async () => {
+      it('should create user in organization and return User object', async () => {
         const userData: CreateUserRequest = {
           cn: 'john.doe',
           uid: 'john.doe',
@@ -185,7 +185,25 @@ describe('OrganizationsResource', () => {
         };
 
         const response: CreateB2BUserResponse = {
-          baseDN: 'uid=john.doe,o=acme-corp,dc=example,dc=com',
+          _id: '550e8400-e29b-41d4-a716-446655440000',
+          cn: 'john.doe',
+          sn: 'Doe',
+          givenName: 'John',
+          displayName: 'John Doe',
+          mobile: '+33612345678',
+          mail: 'john.doe@acme.example.com',
+          domain: 'acme.example.com',
+          userPassword: '$2a$10$...',
+          scryptN: 16384,
+          scryptP: 1,
+          scryptR: 8,
+          scryptSalt: 'salt123',
+          scryptDKLength: 64,
+          iterations: 10000,
+          publicKey: 'pubkey',
+          privateKey: 'privkey',
+          protectedKey: 'protkey',
+          organizationId: 'org_abc123',
         };
         mockHttpClient.post.mockResolvedValue(response);
 
@@ -196,6 +214,8 @@ describe('OrganizationsResource', () => {
           userData
         );
         expect(result).toEqual(response);
+        expect(result._id).toBe('550e8400-e29b-41d4-a716-446655440000');
+        expect(result.organizationId).toBe('org_abc123');
       });
     });
 
