@@ -217,6 +217,63 @@ describe('OrganizationsResource', () => {
         expect(result._id).toBe('550e8400-e29b-41d4-a716-446655440000');
         expect(result.organizationId).toBe('org_abc123');
       });
+
+      it('should create technical user account in organization', async () => {
+        const userData: CreateUserRequest = {
+          cn: 'service.bot',
+          uid: 'service.bot',
+          givenName: 'Service',
+          sn: 'Bot',
+          displayName: 'Service Bot',
+          mobile: '+33600000000',
+          mail: 'service.bot@acme.example.com',
+          domain: 'acme.example.com',
+          userPassword: '$2a$10$...',
+          scryptN: 16384,
+          scryptP: 1,
+          scryptR: 8,
+          scryptSalt: 'salt123',
+          scryptDKLength: 64,
+          iterations: 10000,
+          publicKey: 'pubkey',
+          privateKey: 'privkey',
+          protectedKey: 'protkey',
+          isTechnical: true,
+        };
+
+        const response: CreateB2BUserResponse = {
+          _id: '660e8400-e29b-41d4-a716-446655440000',
+          cn: 'service.bot',
+          sn: 'Bot',
+          givenName: 'Service',
+          displayName: 'Service Bot',
+          mobile: '+33600000000',
+          mail: 'service.bot@acme.example.com',
+          domain: 'acme.example.com',
+          userPassword: '$2a$10$...',
+          scryptN: 16384,
+          scryptP: 1,
+          scryptR: 8,
+          scryptSalt: 'salt123',
+          scryptDKLength: 64,
+          iterations: 10000,
+          publicKey: 'pubkey',
+          privateKey: 'privkey',
+          protectedKey: 'protkey',
+          organizationId: 'org_abc123',
+          isTechnical: true,
+        };
+        mockHttpClient.post.mockResolvedValue(response);
+
+        const result = await organizations.createUser('org_abc123', userData);
+
+        expect(mockHttpClient.post).toHaveBeenCalledWith(
+          '/api/v1/organizations/org_abc123/users',
+          userData
+        );
+        expect(result).toEqual(response);
+        expect(result.isTechnical).toBe(true);
+      });
     });
 
     describe('updateUser', () => {
@@ -275,6 +332,42 @@ describe('OrganizationsResource', () => {
           '/api/v1/organizations/org_abc123/users/john%2Bdoe%40example.com',
           updates
         );
+      });
+
+      it('should update isTechnical field for a user', async () => {
+        const updates: UpdateUserRequest = { isTechnical: true };
+        const response: User = {
+          cn: 'john.doe',
+          sn: 'Doe',
+          givenName: 'John',
+          displayName: 'John Doe',
+          mail: 'john.doe@acme.example.com',
+          mobile: '+33612345678',
+          userPassword: '$2a$10$...',
+          scryptN: 16384,
+          scryptP: 1,
+          scryptR: 8,
+          scryptSalt: 'salt123',
+          scryptDKLength: 64,
+          iterations: 10000,
+          domain: 'acme.example.com',
+          publicKey: 'pubkey',
+          privateKey: 'privkey',
+          protectedKey: 'protkey',
+          isTechnical: true,
+        };
+        mockHttpClient.patch.mockResolvedValue(response);
+
+        const result = await organizations.updateUser('org_abc123', 'john.doe', updates);
+
+        expect(mockHttpClient.patch).toHaveBeenCalledWith(
+          '/api/v1/organizations/org_abc123/users/john.doe',
+          updates
+        );
+        expect(result).toEqual(response);
+        if ('isTechnical' in result) {
+          expect(result.isTechnical).toBe(true);
+        }
       });
     });
 

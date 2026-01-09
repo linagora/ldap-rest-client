@@ -196,6 +196,8 @@ export interface User {
   phone?: PhoneNumber[];
   /** Array of physical addresses */
   address?: Address[];
+  /** Whether this is a technical/service account */
+  isTechnical?: boolean;
 }
 
 /**
@@ -270,6 +272,7 @@ export interface CreateUserRequest extends UserCredentials, UserKeys {
   company?: string;
   phone?: PhoneNumber[];
   address?: Address[];
+  isTechnical?: boolean;
 }
 
 /**
@@ -297,6 +300,7 @@ export interface UpdateUserRequest {
   company?: string;
   phone?: PhoneNumber[];
   address?: Address[];
+  isTechnical?: boolean;
   [key: string]:
     | string
     | number

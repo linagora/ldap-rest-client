@@ -64,6 +64,10 @@ client.users.delete(username)
 client.users.checkAvailability({ field, value })
 client.users.fetch({ by, value, fields })
 client.users.getUserOrganizations(userId, role?) // Get user's organizations by role
+
+// Technical/service accounts
+client.users.create({ ...userData, isTechnical: true }) // Create technical account
+client.users.update(username, { isTechnical: true }) // Mark user as technical
 ```
 
 ### Organizations
@@ -97,6 +101,10 @@ client.organizations.checkUserAvailability(orgId, { field, value })
 
 // User role management ('owner', 'admin', 'moderator', 'member')
 client.organizations.changeUserRole(orgId, userId, { role })
+
+// Technical/service accounts in organizations
+const techUser = await client.organizations.createUser(orgId, { ...userData, isTechnical: true })
+await client.organizations.updateUser(orgId, userId, { isTechnical: true })
 ```
 
 ### Groups
