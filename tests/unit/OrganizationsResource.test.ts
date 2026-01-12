@@ -504,6 +504,52 @@ describe('OrganizationsResource', () => {
         );
         expect(result).toEqual(response);
       });
+
+      it('should list only technical users when isTechnical is true', async () => {
+        const response: ListUsersResponse = {
+          users: [
+            {
+              cn: 'service.bot',
+              sn: 'Bot',
+              givenName: 'Service',
+              displayName: 'Service Bot',
+              mail: 'service.bot@acme.example.com',
+              mobile: '+33600000000',
+              userPassword: '$2a$10$...',
+              scryptN: 16384,
+              scryptP: 1,
+              scryptR: 8,
+              scryptSalt: 'salt123',
+              scryptDKLength: 64,
+              iterations: 10000,
+              domain: 'acme.example.com',
+              publicKey: 'pubkey',
+              privateKey: 'privkey',
+              protectedKey: 'protkey',
+              isTechnical: true,
+            },
+          ],
+          pagination: {
+            page: 1,
+            limit: 20,
+            total: 1,
+            totalPages: 1,
+            hasNextPage: false,
+            hasPreviousPage: false,
+          },
+        };
+        mockHttpClient.get.mockResolvedValue(response);
+
+        const result = await organizations.listUsers('org_abc123', {
+          isTechnical: true,
+        });
+
+        expect(mockHttpClient.get).toHaveBeenCalledWith(
+          '/api/v1/organizations/org_abc123/users?isTechnical=true'
+        );
+        expect(result).toEqual(response);
+        expect(result.users[0].isTechnical).toBe(true);
+      });
     });
 
     describe('checkUserAvailability', () => {

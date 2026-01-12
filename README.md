@@ -96,7 +96,7 @@ const updatedUser = await client.organizations.updateUser(orgId, userId, updates
 client.organizations.disableUser(orgId, userId)
 client.organizations.deleteUser(orgId, userId)
 client.organizations.getUser(orgId, { by, value })
-client.organizations.listUsers(orgId, { page, limit, status, search, sortBy, sortOrder })
+client.organizations.listUsers(orgId, { page, limit, status, search, sortBy, sortOrder, isTechnical })
 client.organizations.checkUserAvailability(orgId, { field, value })
 
 // User role management ('owner', 'admin', 'moderator', 'member')
@@ -105,6 +105,8 @@ client.organizations.changeUserRole(orgId, userId, { role })
 // Technical/service accounts in organizations
 const techUser = await client.organizations.createUser(orgId, { ...userData, isTechnical: true })
 await client.organizations.updateUser(orgId, userId, { isTechnical: true })
+// List only technical users
+await client.organizations.listUsers(orgId, { isTechnical: true })
 ```
 
 ### Groups
