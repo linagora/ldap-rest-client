@@ -354,6 +354,8 @@ export interface ListUsersParams {
   sortBy?: string;
   /** Sort order ('asc' or 'desc') */
   sortOrder?: 'asc' | 'desc';
+  /** Filter by technical account status (true: only technical users, undefined: only non-technical users) */
+  isTechnical?: boolean;
   [key: string]: string | number | boolean | undefined;
 }
 

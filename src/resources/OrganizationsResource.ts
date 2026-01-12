@@ -437,13 +437,19 @@ export class OrganizationsResource extends BaseResource {
    *
    * @example
    * ```typescript
+   * // List all non-technical users (default)
    * const result = await client.organizations.listUsers('org_abc123', {
    *   page: 1,
    *   limit: 20,
    *   status: 'active',
    *   search: 'john',
    *   sortBy: 'createdAt',
-   *   sortOrder: 'desc'
+   *   sortOrder: 'desc',
+   * });
+   *
+   * // List only technical users
+   * const technicalUsers = await client.organizations.listUsers('org_abc123', {
+   *   isTechnical: true
    * });
    * ```
    */
