@@ -170,8 +170,8 @@ export interface User {
   pwdAccountLockedTime?: string;
   /** Organization ID for B2B users */
   organizationId?: string;
-  /** User's role in Twake organization ('owner', 'admin', 'moderator', 'member') */
-  twakeOrganizationRole?: string;
+  /** User's role in organization ('owner', 'admin', 'moderator', 'member') */
+  organizationRole?: string;
   /** Full name as a single string */
   fullname?: string;
   /** Structured name components */
@@ -259,7 +259,7 @@ export interface CreateUserRequest extends UserCredentials, UserKeys {
   twoFactorEnabled?: string;
   recoveryEmail?: string;
   pwdAccountLockedTime?: string;
-  twakeOrganizationRole?: string;
+  organizationRole?: string;
   fullname?: string;
   name?: UserName;
   birthday?: string;
@@ -287,7 +287,7 @@ export interface UpdateUserRequest {
   recoveryEmail?: string;
   displayName?: string;
   pwdAccountLockedTime?: string;
-  twakeOrganizationRole?: string;
+  organizationRole?: string;
   fullname?: string;
   name?: UserName;
   birthday?: string;
