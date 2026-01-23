@@ -6,6 +6,7 @@ import type {
   CreateOrganizationResponse,
   UpdateOrganizationRequest,
   ChangeUserRoleRequest,
+  ChangeUserRoleResponse,
 } from '../../src/models/Organization';
 import type {
   User,
@@ -572,7 +573,7 @@ describe('OrganizationsResource', () => {
     describe('changeUserRole', () => {
       it('should change user role in organization', async () => {
         const roleData: ChangeUserRoleRequest = { role: 'moderator' };
-        const response = { success: true };
+        const response: ChangeUserRoleResponse = { role: 'moderator', previousRole: 'member' };
         mockHttpClient.patch.mockResolvedValue(response);
 
         const result = await organizations.changeUserRole('org_abc123', 'john.doe', roleData);
@@ -582,19 +583,25 @@ describe('OrganizationsResource', () => {
           roleData
         );
         expect(result).toEqual(response);
+        expect(result.role).toBe('moderator');
+        expect(result.previousRole).toBe('member');
       });
 
       it('should handle all valid roles', async () => {
         const roles: Array<'admin' | 'moderator' | 'member'> = ['admin', 'moderator', 'member'];
-        mockHttpClient.patch.mockResolvedValue({ success: true });
 
         for (const role of roles) {
-          await organizations.changeUserRole('org_abc123', 'john.doe', { role });
+          const response: ChangeUserRoleResponse = { role, previousRole: 'member' };
+          mockHttpClient.patch.mockResolvedValue(response);
+
+          const result = await organizations.changeUserRole('org_abc123', 'john.doe', { role });
 
           expect(mockHttpClient.patch).toHaveBeenCalledWith(
             '/api/v1/organizations/org_abc123/users/john.doe/role',
             { role }
           );
+          expect(result.role).toBe(role);
+          expect(result.previousRole).toBe('member');
         }
       });
     });
