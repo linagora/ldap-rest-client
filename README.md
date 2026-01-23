@@ -100,7 +100,9 @@ client.organizations.listUsers(orgId, { page, limit, status, search, sortBy, sor
 client.organizations.checkUserAvailability(orgId, { field, value })
 
 // User role management ('owner', 'admin', 'moderator', 'member')
-client.organizations.changeUserRole(orgId, userId, { role })
+// Returns { role, previousRole }
+const result = await client.organizations.changeUserRole(orgId, userId, { role })
+console.log(`Changed from ${result.previousRole} to ${result.role}`)
 
 // Technical/service accounts in organizations
 const techUser = await client.organizations.createUser(orgId, { ...userData, isTechnical: true })

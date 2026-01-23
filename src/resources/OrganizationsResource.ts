@@ -6,6 +6,7 @@ import type {
   Organization,
   UpdateOrganizationRequest,
   ChangeUserRoleRequest,
+  ChangeUserRoleResponse,
   GetOwnerResponse,
   SetOwnerRequest,
   TransferOwnershipRequest,
@@ -503,23 +504,24 @@ export class OrganizationsResource extends BaseResource {
    * @param {string} organizationId - Organization identifier
    * @param {string} userId - User identifier (username)
    * @param {ChangeUserRoleRequest} data - New role
-   * @returns {Promise<{ success: true }>} Success response
+   * @returns {Promise<ChangeUserRoleResponse>} Response containing the new role and previous role
    * @throws {NotFoundError} When user or organization is not found
    * @throws {ForbiddenError} When attempting self-demotion or removing last admin
    * @throws {ApiError} On other API errors
    *
    * @example
    * ```typescript
-   * await client.organizations.changeUserRole('org_abc123', 'john.doe', {
+   * const result = await client.organizations.changeUserRole('org_abc123', 'john.doe', {
    *   role: 'moderator'
    * });
+   * console.log(`Changed role from ${result.previousRole} to ${result.role}`);
    * ```
    */
   changeUserRole = async (
     organizationId: string,
     userId: string,
     data: ChangeUserRoleRequest
-  ): Promise<{ success: true }> => {
+  ): Promise<ChangeUserRoleResponse> => {
     return this.http.patch(
       `/api/v1/organizations/${encodeURIComponent(organizationId)}/users/${encodeURIComponent(userId)}/role`,
       data

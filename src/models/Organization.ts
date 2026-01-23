@@ -98,6 +98,16 @@ export interface ChangeUserRoleRequest {
 }
 
 /**
+ * Response from changing a user's role in an organization
+ */
+export interface ChangeUserRoleResponse {
+  /** The new role assigned to the user */
+  role: OrganizationRole;
+  /** The user's previous role before the change */
+  previousRole: OrganizationRole;
+}
+
+/**
  * Organization owner information
  */
 export interface OrganizationOwner {
