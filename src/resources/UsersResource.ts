@@ -6,6 +6,7 @@ import type {
   FetchUserRequest,
   CheckAvailabilityParams,
   CheckAvailabilityResponse,
+  SearchUsersParams,
 } from '../models';
 import type { Organization } from '../models/Organization';
 
@@ -130,6 +131,38 @@ export class UsersResource extends BaseResource {
   fetch = async (params: FetchUserRequest): Promise<User> => {
     const query = this.buildQueryString(params);
     return this.http.get(`/api/v1/users${query}`);
+  };
+
+  /**
+   * Search users across all branches (B2C and B2B)
+   *
+   * Returns array of all users matching the search criteria from both
+   * B2C and B2B branches. Email searches return immediately if found
+   * in B2C since email is unique.
+   *
+   * @param {SearchUsersParams} params - Search parameters (by, value, fields)
+   * @returns {Promise<User[]>} Array of matching users
+   * @throws {ApiError} On API errors
+   *
+   * @example
+   * ```typescript
+   * // Search by username across all branches
+   * const users = await client.users.search({
+   *   by: 'username',
+   *   value: 'johndoe'
+   * });
+   *
+   * // Search by email with field filtering
+   * const users = await client.users.search({
+   *   by: 'email',
+   *   value: 'john@example.com',
+   *   fields: 'cn,mail,organizationId'
+   * });
+   * ```
+   */
+  search = async (params: SearchUsersParams): Promise<User[]> => {
+    const query = this.buildQueryString(params);
+    return this.http.get(`/api/v1/users/search${query}`);
   };
 
   /**
