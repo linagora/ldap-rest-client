@@ -27,6 +27,263 @@ describe('UsersResource', () => {
     expect(users).toBeInstanceOf(UsersResource);
   });
 
+  describe('create', () => {
+    it('should create a new user', async () => {
+      const userData = {
+        cn: 'johndoe',
+        uid: 'johndoe',
+        sn: 'Doe',
+        givenName: 'John',
+        mail: 'john@example.com',
+        mobile: '+1234567890',
+        userPassword: 'securepass123',
+      };
+      const response = { success: true as const };
+      mockHttpClient.post.mockResolvedValue(response);
+
+      const result = await users.create(userData);
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/users', userData);
+      expect(result).toEqual(response);
+    });
+  });
+
+  describe('update', () => {
+    it('should update an existing user', async () => {
+      const updateData = {
+        givenName: 'Jane',
+        mail: 'jane@example.com',
+      };
+      const response = { success: true as const };
+      mockHttpClient.patch.mockResolvedValue(response);
+
+      const result = await users.update('johndoe', updateData);
+
+      expect(mockHttpClient.patch).toHaveBeenCalledWith('/api/v1/users/johndoe', updateData);
+      expect(result).toEqual(response);
+    });
+
+    it('should handle special characters in userId', async () => {
+      const updateData = { givenName: 'John' };
+      const response = { success: true as const };
+      mockHttpClient.patch.mockResolvedValue(response);
+
+      await users.update('john+doe@example.com', updateData);
+
+      expect(mockHttpClient.patch).toHaveBeenCalledWith(
+        '/api/v1/users/john%2Bdoe%40example.com',
+        updateData
+      );
+    });
+  });
+
+  describe('disable', () => {
+    it('should disable a user account', async () => {
+      const response = { success: true as const };
+      mockHttpClient.post.mockResolvedValue(response);
+
+      const result = await users.disable('johndoe');
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/users/johndoe/disable');
+      expect(result).toEqual(response);
+    });
+
+    it('should handle special characters in userId', async () => {
+      const response = { success: true as const };
+      mockHttpClient.post.mockResolvedValue(response);
+
+      await users.disable('john+doe@example.com');
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith(
+        '/api/v1/users/john%2Bdoe%40example.com/disable'
+      );
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a user', async () => {
+      const response = { success: true as const };
+      mockHttpClient.delete.mockResolvedValue(response);
+
+      const result = await users.delete('johndoe');
+
+      expect(mockHttpClient.delete).toHaveBeenCalledWith('/api/v1/users/johndoe');
+      expect(result).toEqual(response);
+    });
+
+    it('should handle special characters in userId', async () => {
+      const response = { success: true as const };
+      mockHttpClient.delete.mockResolvedValue(response);
+
+      await users.delete('john+doe@example.com');
+
+      expect(mockHttpClient.delete).toHaveBeenCalledWith('/api/v1/users/john%2Bdoe%40example.com');
+    });
+  });
+
+  describe('checkAvailability', () => {
+    it('should check username availability', async () => {
+      const response = { available: true };
+      mockHttpClient.get.mockResolvedValue(response);
+
+      const result = await users.checkAvailability({
+        field: 'username',
+        value: 'johndoe',
+      });
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/users/check?field=username&value=johndoe'
+      );
+      expect(result).toEqual(response);
+    });
+
+    it('should check email availability', async () => {
+      const response = { available: false };
+      mockHttpClient.get.mockResolvedValue(response);
+
+      const result = await users.checkAvailability({
+        field: 'email',
+        value: 'john@example.com',
+      });
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/users/check?field=email&value=john%40example.com'
+      );
+      expect(result).toEqual(response);
+    });
+
+    it('should check phone availability', async () => {
+      const response = { available: true };
+      mockHttpClient.get.mockResolvedValue(response);
+
+      const result = await users.checkAvailability({
+        field: 'phone',
+        value: '+1234567890',
+      });
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/users/check?field=phone&value=%2B1234567890'
+      );
+      expect(result).toEqual(response);
+    });
+  });
+
+  describe('fetch', () => {
+    it('should fetch user by username', async () => {
+      const response: User = {
+        cn: 'johndoe',
+        sn: 'Doe',
+        givenName: 'John',
+        displayName: 'John Doe',
+        mail: 'john@example.com',
+        mobile: '+1234567890',
+        userPassword: 'encrypted',
+        scryptR: 8,
+        scryptN: 16384,
+        scryptP: 1,
+        scryptSalt: 'salt',
+        scryptDKLength: 32,
+        iterations: 10000,
+        domain: 'example.com',
+        publicKey: 'pub',
+        privateKey: 'priv',
+        protectedKey: 'protected',
+      };
+      mockHttpClient.get.mockResolvedValue(response);
+
+      const result = await users.fetch({
+        by: 'username',
+        value: 'johndoe',
+      });
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/users?by=username&value=johndoe');
+      expect(result).toEqual(response);
+    });
+
+    it('should fetch user by email', async () => {
+      const response: User = {
+        cn: 'johndoe',
+        sn: 'Doe',
+        givenName: 'John',
+        displayName: 'John Doe',
+        mail: 'john@example.com',
+        mobile: '+1234567890',
+        userPassword: 'encrypted',
+        scryptR: 8,
+        scryptN: 16384,
+        scryptP: 1,
+        scryptSalt: 'salt',
+        scryptDKLength: 32,
+        iterations: 10000,
+        domain: 'example.com',
+        publicKey: 'pub',
+        privateKey: 'priv',
+        protectedKey: 'protected',
+      };
+      mockHttpClient.get.mockResolvedValue(response);
+
+      const result = await users.fetch({
+        by: 'email',
+        value: 'john@example.com',
+      });
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/users?by=email&value=john%40example.com'
+      );
+      expect(result).toEqual(response);
+    });
+
+    it('should fetch user with field filtering', async () => {
+      const response: User = {
+        cn: 'johndoe',
+        mail: 'john@example.com',
+      } as User;
+      mockHttpClient.get.mockResolvedValue(response);
+
+      const result = await users.fetch({
+        by: 'username',
+        value: 'johndoe',
+        fields: 'cn,mail',
+      });
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/users?by=username&value=johndoe&fields=cn%2Cmail'
+      );
+      expect(result).toEqual(response);
+    });
+
+    it('should fetch user by phone', async () => {
+      const response: User = {
+        cn: 'johndoe',
+        sn: 'Doe',
+        givenName: 'John',
+        displayName: 'John Doe',
+        mail: 'john@example.com',
+        mobile: '+1234567890',
+        userPassword: 'encrypted',
+        scryptR: 8,
+        scryptN: 16384,
+        scryptP: 1,
+        scryptSalt: 'salt',
+        scryptDKLength: 32,
+        iterations: 10000,
+        domain: 'example.com',
+        publicKey: 'pub',
+        privateKey: 'priv',
+        protectedKey: 'protected',
+      };
+      mockHttpClient.get.mockResolvedValue(response);
+
+      const result = await users.fetch({
+        by: 'phone',
+        value: '+1234567890',
+      });
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/users?by=phone&value=%2B1234567890');
+      expect(result).toEqual(response);
+    });
+  });
+
   describe('getUserOrganizations', () => {
     it('should get all organizations for a user', async () => {
       const response: Organization[] = [
