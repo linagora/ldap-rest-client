@@ -115,6 +115,10 @@ const techUser = await client.organizations.createUser(orgId, { ...userData, isT
 await client.organizations.updateUser(orgId, userId, { isTechnical: true })
 // List only technical users
 await client.organizations.listUsers(orgId, { isTechnical: true })
+
+// Invited users (pending invitation status for B2B users)
+const invitedUser = await client.organizations.createUser(orgId, { ...userData, invited: true })
+await client.organizations.updateUser(orgId, userId, { invited: false })
 ```
 
 ### Groups
