@@ -24,6 +24,7 @@ describe('OrganizationsResource', () => {
     mockHttpClient = {
       get: jest.fn(),
       post: jest.fn(),
+      put: jest.fn(),
       patch: jest.fn(),
       delete: jest.fn(),
       request: jest.fn(),
@@ -697,6 +698,126 @@ describe('OrganizationsResource', () => {
           expect(result.previousRole).toBe('member');
         }
       });
+    });
+  });
+
+  describe('getOwner', () => {
+    it('should get organization owner', async () => {
+      const response = {
+        owner: {
+          username: 'john.doe',
+          mail: 'john.doe@acme.example.com',
+        },
+      };
+      mockHttpClient.get.mockResolvedValue(response);
+
+      const result = await organizations.getOwner('org_abc123');
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/organizations/org_abc123/owner');
+      expect(result).toEqual(response);
+    });
+
+    it('should handle organization with no owner', async () => {
+      const response = { owner: null };
+      mockHttpClient.get.mockResolvedValue(response);
+
+      const result = await organizations.getOwner('org_abc123');
+
+      expect(result.owner).toBeNull();
+    });
+
+    it('should handle special characters in organizationId', async () => {
+      const response = { owner: null };
+      mockHttpClient.get.mockResolvedValue(response);
+
+      await organizations.getOwner('org_test+123');
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/organizations/org_test%2B123/owner');
+    });
+  });
+
+  describe('setOwner', () => {
+    it('should set initial owner of organization', async () => {
+      const ownerData = {
+        username: 'john.doe',
+        mail: 'john.doe@acme.example.com',
+      };
+      const response = { success: true as const };
+      mockHttpClient.post.mockResolvedValue(response);
+
+      const result = await organizations.setOwner('org_abc123', ownerData);
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith(
+        '/api/v1/organizations/org_abc123/owner',
+        ownerData
+      );
+      expect(result).toEqual(response);
+    });
+
+    it('should handle special characters in organizationId', async () => {
+      const ownerData = {
+        username: 'john.doe',
+        mail: 'john.doe@acme.example.com',
+      };
+      const response = { success: true as const };
+      mockHttpClient.post.mockResolvedValue(response);
+
+      await organizations.setOwner('org_test+123', ownerData);
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith(
+        '/api/v1/organizations/org_test%2B123/owner',
+        ownerData
+      );
+    });
+  });
+
+  describe('transferOwnership', () => {
+    it('should transfer organization ownership', async () => {
+      const transferData = { newOwnerUsername: 'jane.doe' };
+      const response = { success: true as const };
+      mockHttpClient.put.mockResolvedValue(response);
+
+      const result = await organizations.transferOwnership('org_abc123', transferData);
+
+      expect(mockHttpClient.put).toHaveBeenCalledWith(
+        '/api/v1/organizations/org_abc123/owner',
+        transferData
+      );
+      expect(result).toEqual(response);
+    });
+
+    it('should handle special characters in organizationId', async () => {
+      const transferData = { newOwnerUsername: 'jane.doe' };
+      const response = { success: true as const };
+      mockHttpClient.put.mockResolvedValue(response);
+
+      await organizations.transferOwnership('org_test+123', transferData);
+
+      expect(mockHttpClient.put).toHaveBeenCalledWith(
+        '/api/v1/organizations/org_test%2B123/owner',
+        transferData
+      );
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete organization', async () => {
+      const response = { success: true as const };
+      mockHttpClient.delete.mockResolvedValue(response);
+
+      const result = await organizations.delete('org_abc123');
+
+      expect(mockHttpClient.delete).toHaveBeenCalledWith('/api/v1/organizations/org_abc123');
+      expect(result).toEqual(response);
+    });
+
+    it('should handle special characters in organizationId', async () => {
+      const response = { success: true as const };
+      mockHttpClient.delete.mockResolvedValue(response);
+
+      await organizations.delete('org_test+123');
+
+      expect(mockHttpClient.delete).toHaveBeenCalledWith('/api/v1/organizations/org_test%2B123');
     });
   });
 });
