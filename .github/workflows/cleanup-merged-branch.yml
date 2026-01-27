@@ -1,0 +1,33 @@
+name: Cleanup Merged Branch
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main, develop]
+
+jobs:
+  delete-branch:
+    name: Delete Merged Branch
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Delete branch
+        run: |
+          echo "Deleting branch: ${{ github.event.pull_request.head.ref }}"
+          gh api \
+            --method DELETE \
+            "repos/${{ github.repository }}/git/refs/heads/${{ github.event.pull_request.head.ref }}" \
+            || echo "Branch already deleted or does not exist"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Comment on PR
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --body "Branch \`${{ github.event.pull_request.head.ref }}\` has been automatically deleted after merge."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
