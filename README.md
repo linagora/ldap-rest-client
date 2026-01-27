@@ -1,6 +1,14 @@
 # ldap-rest-client
 
-TypeScript client for LDAP-REST API with HMAC-SHA256 and SSO cookie authentication.
+TypeScript client library for LDAP-REST API with dual authentication support (HMAC-SHA256 for backend services, SSO cookies for browsers).
+
+## Features
+
+- **Dual Authentication**: HMAC-SHA256 for backend services, SSO cookies for browsers
+- **Type-Safe**: Full TypeScript support with comprehensive type definitions
+- **Resource-Based API**: Clean, intuitive interface for users, organizations, and groups
+- **Error Handling**: Semantic error types mapped to HTTP status codes
+- **Cross-Platform**: Works in Node.js (18+) and browser environments
 
 ## Installation
 
@@ -24,11 +32,31 @@ const client = new LdapRestClient({
   },
 });
 
-// Create user
-await client.users.create(userData);
+// Create B2C user
+await client.users.create({
+  username: 'johndoe',
+  mail: 'john@example.com',
+  givenName: 'John',
+  cn: 'John Doe',
+  sn: 'Doe',
+  userPassword: 'secure-password',
+});
 
 // Create organization
-await client.organizations.create({ id, name, domain });
+await client.organizations.create({
+  id: 'acme-corp',
+  name: 'Acme Corporation',
+  domain: 'acme.com',
+});
+
+// Create B2B user in organization
+const user = await client.organizations.createUser('acme-corp', {
+  username: 'employee',
+  mail: 'employee@acme.com',
+  givenName: 'Jane',
+  cn: 'Jane Smith',
+  sn: 'Smith',
+});
 ```
 
 ### Browser (SSO Cookie)
@@ -36,168 +64,115 @@ await client.organizations.create({ id, name, domain });
 ```typescript
 const client = new LdapRestClient({
   baseUrl: 'https://ldap-rest.example.com',
+  // auth defaults to browser cookie-based authentication
 });
 
-// Manage users in organization (returns User object)
-const user = await client.organizations.createUser(orgId, userData);
-console.log(user._id); // Access unique identifier
-console.log(user.organizationId); // Access organization ID
+// List users in organization
+const result = await client.organizations.listUsers('acme-corp', {
+  page: 1,
+  limit: 20,
+});
 
-await client.organizations.listUsers(orgId, { page: 1, limit: 20 });
+// Create and manage groups
+const group = await client.groups.create('acme-corp', {
+  name: 'engineering',
+  description: 'Engineering team',
+});
 
-// Manage groups (returns Group object)
-const group = await client.groups.create(orgId, { name: 'engineering' });
-await client.groups.addMembers(orgId, groupId, { usernames: ['user1'] });
-
-// Get user's organizations
-const orgs = await client.users.getUserOrganizations(userId, 'admin');
+await client.groups.addMembers('acme-corp', group._id, {
+  usernames: ['user1', 'user2'],
+});
 ```
 
-## API Reference
+## API Overview
 
-### Users (B2C)
-```typescript
-client.users.create(userData)
-client.users.update(username, updates)
-client.users.disable(username)
-client.users.delete(username)
-client.users.checkAvailability({ field, value })
-client.users.fetch({ by, value, fields })
-client.users.getUserOrganizations(userId, role?) // Get user's organizations by role
+The client provides three main resource interfaces:
 
-// Search users across all branches (B2C and B2B)
-// Returns array of users matching the search criteria
-const users = await client.users.search({ by: 'username', value: 'johndoe' })
-const users = await client.users.search({ by: 'email', value: 'john@example.com', fields: 'cn,mail' })
-const users = await client.users.search({ by: 'phone', value: '+1234567890' })
+- **`client.users`** - B2C user management (top-level users)
+- **`client.organizations`** - Organization and B2B user management
+- **`client.groups`** - Group management within organizations
 
-// Technical/service accounts
-client.users.create({ ...userData, isTechnical: true }) // Create technical account
-client.users.update(username, { isTechnical: true }) // Mark user as technical
-```
+For complete API documentation, see **[API.md](./API.md)**.
 
-### Organizations
-```typescript
-client.organizations.create({ id, name, domain })
-client.organizations.createAdmin(orgId, { username, mail })
-client.organizations.list()
-client.organizations.get(orgId)
-client.organizations.update(orgId, updates)
+### Key Concepts
 
-// Organization ownership management
-client.organizations.getOwner(orgId)
-client.organizations.setOwner(orgId, { username, mail })
-client.organizations.transferOwnership(orgId, { newOwnerUsername })
-```
-
-### B2B Users (within Organizations)
-```typescript
-// Returns full User object with _id and organizationId
-const user = await client.organizations.createUser(orgId, userData)
-console.log(user._id, user.organizationId)
-
-// Returns updated User object or { success: true }
-const updatedUser = await client.organizations.updateUser(orgId, userId, updates)
-
-client.organizations.disableUser(orgId, userId)
-client.organizations.deleteUser(orgId, userId)
-client.organizations.getUser(orgId, { by, value })
-client.organizations.listUsers(orgId, { page, limit, status, search, sortBy, sortOrder, isTechnical })
-client.organizations.checkUserAvailability(orgId, { field, value })
-
-// User role management ('owner', 'admin', 'moderator', 'member')
-// Returns { role, previousRole }
-const result = await client.organizations.changeUserRole(orgId, userId, { role })
-console.log(`Changed from ${result.previousRole} to ${result.role}`)
-
-// Technical/service accounts in organizations
-const techUser = await client.organizations.createUser(orgId, { ...userData, isTechnical: true })
-await client.organizations.updateUser(orgId, userId, { isTechnical: true })
-// List only technical users
-await client.organizations.listUsers(orgId, { isTechnical: true })
-
-// Invited users (pending invitation status for B2B users)
-const invitedUser = await client.organizations.createUser(orgId, { ...userData, invited: true })
-await client.organizations.updateUser(orgId, userId, { invited: false })
-```
-
-### Groups
-```typescript
-// Returns Group object directly
-const group = await client.groups.create(orgId, { name, description })
-
-client.groups.list(orgId, { page, limit })
-client.groups.get(orgId, groupId)
-client.groups.update(orgId, groupId, updates)
-client.groups.delete(orgId, groupId)
-client.groups.addMembers(orgId, groupId, { usernames })
-client.groups.removeMember(orgId, groupId, userId)
-```
+**Authentication:**
+- **HMAC-SHA256**: For server-to-server communication
+- **Cookie/SSO**: For browser-based applications
 
 ## Configuration
 
-### Client Options
-
 ```typescript
 const client = new LdapRestClient({
-  baseUrl: 'https://ldap-rest.example.com',
+  baseUrl: 'https://ldap-rest.example.com', // Required
   auth: {
-    type: 'hmac',
+    type: 'hmac', // or 'cookie'
     serviceId: 'my-service',
     secret: 'your-secret-key-at-least-32-chars-long',
   },
-  timeout: 30000, // Request timeout in milliseconds (default: 30000)
+  timeout: 30000, // Optional, default: 30000ms
   logger: {
-    // Optional tslog configuration for custom logging
-    minLevel: 'info',
+    minLevel: 'info', // Optional, tslog configuration
   },
 });
 ```
 
-### Authentication Types
-
-**HMAC (Backend Services)**
-```typescript
-auth: {
-  type: 'hmac',
-  serviceId: 'registration-service',
-  secret: 'your-secret-key', // Minimum 32 characters recommended
-}
-```
-
-**Cookie (Browser/SSO)**
-```typescript
-auth: {
-  type: 'cookie', // Uses cookies set by authentication service
-}
-// Or omit auth entirely (defaults to cookie)
-```
+See **[API.md - Configuration](./API.md#configuration)** for detailed options.
 
 ## Error Handling
 
+All errors extend `LdapRestError` and map to specific HTTP status codes:
+
 ```typescript
-import { ConflictError, NotFoundError } from '@linagora/ldap-rest-client';
+import {
+  ValidationError,
+  NotFoundError,
+  ConflictError,
+} from '@linagora/ldap-rest-client';
 
 try {
   await client.users.create(userData);
 } catch (error) {
   if (error instanceof ConflictError) {
-    // Handle conflict (409)
-  } else if (error instanceof NotFoundError) {
-    // Handle not found (404)
+    console.error('User already exists');
+  } else if (error instanceof ValidationError) {
+    console.error('Invalid data:', error.message);
   }
 }
 ```
 
-Available errors: `ValidationError`, `AuthenticationError`, `AuthorizationError`, `NotFoundError`, `ConflictError`, `RateLimitError`, `NetworkError`, `ApiError`
+**Available error types:** `ValidationError` (400), `AuthenticationError` (401), `AuthorizationError` (403), `NotFoundError` (404), `ConflictError` (409), `RateLimitError` (429), `NetworkError`, `ApiError`.
+
+See **[API.md - Error Handling](./API.md#error-handling)** for complete documentation.
+
+## Documentation
+
+- **[API Reference](./API.md)** - Complete API documentation
 
 ## Development
 
 ```bash
+# Install dependencies
 npm install
+
+# Run tests
 npm test
+
+# Build library
 npm run build
+
+# Type checking
+npm run typecheck
+
+# Linting and formatting
+npm run lint
+npm run format
 ```
+
+## Requirements
+
+- Node.js 18+
+- TypeScript 5+
 
 ## License
 
