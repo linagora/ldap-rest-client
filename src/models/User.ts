@@ -381,3 +381,16 @@ export interface ListUsersResponse {
  * Returns the full user object with all fields populated
  */
 export type CreateB2BUserResponse = User;
+
+/**
+ * Parameters for searching users across all branches
+ */
+export interface SearchUsersParams {
+  /** Search field (username, email, phone, recoveryEmail) */
+  by: UserSearchField | 'recoveryEmail';
+  /** Search value */
+  value: string;
+  /** Optional comma-separated list of fields to return */
+  fields?: string;
+  [key: string]: string | undefined;
+}

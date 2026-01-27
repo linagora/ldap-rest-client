@@ -65,6 +65,12 @@ client.users.checkAvailability({ field, value })
 client.users.fetch({ by, value, fields })
 client.users.getUserOrganizations(userId, role?) // Get user's organizations by role
 
+// Search users across all branches (B2C and B2B)
+// Returns array of users matching the search criteria
+const users = await client.users.search({ by: 'username', value: 'johndoe' })
+const users = await client.users.search({ by: 'email', value: 'john@example.com', fields: 'cn,mail' })
+const users = await client.users.search({ by: 'phone', value: '+1234567890' })
+
 // Technical/service accounts
 client.users.create({ ...userData, isTechnical: true }) // Create technical account
 client.users.update(username, { isTechnical: true }) // Mark user as technical

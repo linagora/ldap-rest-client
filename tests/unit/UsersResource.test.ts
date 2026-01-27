@@ -1,6 +1,7 @@
 import { UsersResource } from '../../src/resources/UsersResource';
 import { HttpClient } from '../../src/lib/HttpClient';
 import type { Organization } from '../../src/models/Organization';
+import type { User } from '../../src/models/User';
 
 describe('UsersResource', () => {
   let users: UsersResource;
@@ -105,6 +106,199 @@ describe('UsersResource', () => {
       const result = await users.getUserOrganizations('new.user');
 
       expect(result).toEqual([]);
+    });
+  });
+
+  describe('search', () => {
+    it('should search users by username', async () => {
+      const response: User[] = [
+        {
+          cn: 'johndoe',
+          sn: 'Doe',
+          givenName: 'John',
+          displayName: 'John Doe',
+          mail: 'john@example.com',
+          mobile: '+1234567890',
+          userPassword: 'encrypted',
+          scryptR: 8,
+          scryptN: 16384,
+          scryptP: 1,
+          scryptSalt: 'salt',
+          scryptDKLength: 32,
+          iterations: 10000,
+          domain: 'example.com',
+          publicKey: 'pub',
+          privateKey: 'priv',
+          protectedKey: 'protected',
+        },
+      ];
+      mockHttpClient.get.mockResolvedValue(response);
+
+      const result = await users.search({
+        by: 'username',
+        value: 'johndoe',
+      });
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/users/search?by=username&value=johndoe'
+      );
+      expect(result).toEqual(response);
+    });
+
+    it('should search users by email', async () => {
+      const response: User[] = [
+        {
+          cn: 'johndoe',
+          sn: 'Doe',
+          givenName: 'John',
+          displayName: 'John Doe',
+          mail: 'john@example.com',
+          mobile: '+1234567890',
+          userPassword: 'encrypted',
+          scryptR: 8,
+          scryptN: 16384,
+          scryptP: 1,
+          scryptSalt: 'salt',
+          scryptDKLength: 32,
+          iterations: 10000,
+          domain: 'example.com',
+          publicKey: 'pub',
+          privateKey: 'priv',
+          protectedKey: 'protected',
+        },
+      ];
+      mockHttpClient.get.mockResolvedValue(response);
+
+      const result = await users.search({
+        by: 'email',
+        value: 'john@example.com',
+      });
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/users/search?by=email&value=john%40example.com'
+      );
+      expect(result).toEqual(response);
+    });
+
+    it('should search users with field filtering', async () => {
+      const response: User[] = [
+        {
+          cn: 'johndoe',
+          mail: 'john@example.com',
+        } as User,
+      ];
+      mockHttpClient.get.mockResolvedValue(response);
+
+      const result = await users.search({
+        by: 'username',
+        value: 'johndoe',
+        fields: 'cn,mail',
+      });
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/users/search?by=username&value=johndoe&fields=cn%2Cmail'
+      );
+      expect(result).toEqual(response);
+    });
+
+    it('should return empty array when no users match', async () => {
+      mockHttpClient.get.mockResolvedValue([]);
+
+      const result = await users.search({
+        by: 'username',
+        value: 'nonexistent',
+      });
+
+      expect(result).toEqual([]);
+    });
+
+    it('should search by phone number', async () => {
+      const response: User[] = [
+        {
+          cn: 'johndoe',
+          sn: 'Doe',
+          givenName: 'John',
+          displayName: 'John Doe',
+          mail: 'john@example.com',
+          mobile: '+1234567890',
+          userPassword: 'encrypted',
+          scryptR: 8,
+          scryptN: 16384,
+          scryptP: 1,
+          scryptSalt: 'salt',
+          scryptDKLength: 32,
+          iterations: 10000,
+          domain: 'example.com',
+          publicKey: 'pub',
+          privateKey: 'priv',
+          protectedKey: 'protected',
+        },
+      ];
+      mockHttpClient.get.mockResolvedValue(response);
+
+      const result = await users.search({
+        by: 'phone',
+        value: '+1234567890',
+      });
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/users/search?by=phone&value=%2B1234567890'
+      );
+      expect(result).toEqual(response);
+    });
+
+    it('should return multiple users from different branches', async () => {
+      const response: User[] = [
+        {
+          cn: 'johndoe',
+          sn: 'Doe',
+          givenName: 'John',
+          displayName: 'John Doe',
+          mail: 'john@b2c.com',
+          mobile: '+1234567890',
+          userPassword: 'encrypted',
+          scryptR: 8,
+          scryptN: 16384,
+          scryptP: 1,
+          scryptSalt: 'salt',
+          scryptDKLength: 32,
+          iterations: 10000,
+          domain: 'example.com',
+          publicKey: 'pub',
+          privateKey: 'priv',
+          protectedKey: 'protected',
+        },
+        {
+          cn: 'johndoe',
+          sn: 'Doe',
+          givenName: 'John',
+          displayName: 'John Doe',
+          mail: 'john@org.com',
+          mobile: '+1234567890',
+          userPassword: 'encrypted',
+          scryptR: 8,
+          scryptN: 16384,
+          scryptP: 1,
+          scryptSalt: 'salt',
+          scryptDKLength: 32,
+          iterations: 10000,
+          domain: 'example.com',
+          publicKey: 'pub',
+          privateKey: 'priv',
+          protectedKey: 'protected',
+          organizationId: 'org_123',
+        },
+      ];
+      mockHttpClient.get.mockResolvedValue(response);
+
+      const result = await users.search({
+        by: 'username',
+        value: 'johndoe',
+      });
+
+      expect(result).toHaveLength(2);
+      expect(result[0]).not.toHaveProperty('organizationId');
+      expect(result[1]).toHaveProperty('organizationId', 'org_123');
     });
   });
 });
