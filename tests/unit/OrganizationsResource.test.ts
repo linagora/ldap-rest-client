@@ -275,6 +275,63 @@ describe('OrganizationsResource', () => {
         expect(result).toEqual(response);
         expect(result.isTechnical).toBe(true);
       });
+
+      it('should create invited user in organization', async () => {
+        const userData: CreateUserRequest = {
+          cn: 'jane.smith',
+          uid: 'jane.smith',
+          givenName: 'Jane',
+          sn: 'Smith',
+          displayName: 'Jane Smith',
+          mobile: '+33612345679',
+          mail: 'jane.smith@acme.example.com',
+          domain: 'acme.example.com',
+          userPassword: '$2a$10$...',
+          scryptN: 16384,
+          scryptP: 1,
+          scryptR: 8,
+          scryptSalt: 'salt456',
+          scryptDKLength: 64,
+          iterations: 10000,
+          publicKey: 'pubkey2',
+          privateKey: 'privkey2',
+          protectedKey: 'protkey2',
+          invited: true,
+        };
+
+        const response: CreateB2BUserResponse = {
+          _id: '770e8400-e29b-41d4-a716-446655440000',
+          cn: 'jane.smith',
+          sn: 'Smith',
+          givenName: 'Jane',
+          displayName: 'Jane Smith',
+          mobile: '+33612345679',
+          mail: 'jane.smith@acme.example.com',
+          domain: 'acme.example.com',
+          userPassword: '$2a$10$...',
+          scryptN: 16384,
+          scryptP: 1,
+          scryptR: 8,
+          scryptSalt: 'salt456',
+          scryptDKLength: 64,
+          iterations: 10000,
+          publicKey: 'pubkey2',
+          privateKey: 'privkey2',
+          protectedKey: 'protkey2',
+          organizationId: 'org_abc123',
+          invited: true,
+        };
+        mockHttpClient.post.mockResolvedValue(response);
+
+        const result = await organizations.createUser('org_abc123', userData);
+
+        expect(mockHttpClient.post).toHaveBeenCalledWith(
+          '/api/v1/organizations/org_abc123/users',
+          userData
+        );
+        expect(result).toEqual(response);
+        expect(result.invited).toBe(true);
+      });
     });
 
     describe('updateUser', () => {
@@ -368,6 +425,42 @@ describe('OrganizationsResource', () => {
         expect(result).toEqual(response);
         if ('isTechnical' in result) {
           expect(result.isTechnical).toBe(true);
+        }
+      });
+
+      it('should update invited field for a user', async () => {
+        const updates: UpdateUserRequest = { invited: false };
+        const response: User = {
+          cn: 'jane.smith',
+          sn: 'Smith',
+          givenName: 'Jane',
+          displayName: 'Jane Smith',
+          mail: 'jane.smith@acme.example.com',
+          mobile: '+33612345679',
+          userPassword: '$2a$10$...',
+          scryptN: 16384,
+          scryptP: 1,
+          scryptR: 8,
+          scryptSalt: 'salt456',
+          scryptDKLength: 64,
+          iterations: 10000,
+          domain: 'acme.example.com',
+          publicKey: 'pubkey2',
+          privateKey: 'privkey2',
+          protectedKey: 'protkey2',
+          invited: false,
+        };
+        mockHttpClient.patch.mockResolvedValue(response);
+
+        const result = await organizations.updateUser('org_abc123', 'jane.smith', updates);
+
+        expect(mockHttpClient.patch).toHaveBeenCalledWith(
+          '/api/v1/organizations/org_abc123/users/jane.smith',
+          updates
+        );
+        expect(result).toEqual(response);
+        if ('invited' in result) {
+          expect(result.invited).toBe(false);
         }
       });
     });
