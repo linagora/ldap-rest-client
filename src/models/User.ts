@@ -198,6 +198,8 @@ export interface User {
   address?: Address[];
   /** Whether this is a technical/service account */
   isTechnical?: boolean;
+  /** Whether this B2B user is pending invitation (only for B2B users) */
+  invited?: boolean;
 }
 
 /**
@@ -273,6 +275,7 @@ export interface CreateUserRequest extends UserCredentials, UserKeys {
   phone?: PhoneNumber[];
   address?: Address[];
   isTechnical?: boolean;
+  invited?: boolean;
 }
 
 /**
@@ -301,6 +304,7 @@ export interface UpdateUserRequest {
   phone?: PhoneNumber[];
   address?: Address[];
   isTechnical?: boolean;
+  invited?: boolean;
   [key: string]:
     | string
     | number
