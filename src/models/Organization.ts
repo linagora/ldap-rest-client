@@ -30,10 +30,16 @@ export interface Organization {
 export type OrganizationStatus = 'active' | 'suspended';
 
 /**
+ * Supported primitive types for metadata values
+ */
+export type MetadataValue = string | number | boolean | null;
+
+/**
  * Optional metadata for organization customization
  *
  * Allows storing custom properties like industry, company size,
  * contact information, or any other organization-specific data.
+ * Supports strings, numbers, booleans, and null values.
  */
 export interface OrganizationMetadata {
   /** Industry/sector (e.g., 'Technology', 'Healthcare') */
@@ -43,7 +49,7 @@ export interface OrganizationMetadata {
   /** Primary contact information */
   contact?: string;
   /** Additional custom fields as key-value pairs */
-  [key: string]: string | undefined;
+  [key: string]: MetadataValue | undefined;
 }
 
 /**
