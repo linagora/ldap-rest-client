@@ -7,6 +7,7 @@ import type {
   UpdateOrganizationRequest,
   ChangeUserRoleRequest,
   ChangeUserRoleResponse,
+  OrganizationMetadata,
 } from '../../src/models/Organization';
 import type {
   User,
@@ -159,6 +160,151 @@ describe('OrganizationsResource', () => {
         request
       );
       expect(result).toEqual(response);
+    });
+  });
+
+  describe('metadata with mixed value types', () => {
+    it('should create organization with metadata containing various types', async () => {
+      const metadata: OrganizationMetadata = {
+        industry: 'Technology',
+        size: '51-200',
+        employeeCount: 150,
+        isPremium: true,
+        isVerified: false,
+        foundedYear: 2020,
+        rating: 4.5,
+        customField: null,
+      };
+
+      const request: CreateOrganizationRequest = {
+        id: 'org_abc123',
+        name: 'Acme Corp',
+        domain: 'acme.example.com',
+        metadata,
+      };
+
+      const response: CreateOrganizationResponse = {
+        success: true,
+        organization: {
+          id: 'org_abc123',
+          name: 'Acme Corp',
+          domain: 'acme.example.com',
+          baseDN: 'o=acme-corp,dc=example,dc=com',
+          status: 'active',
+          createdAt: new Date('2025-01-23T10:30:00Z'),
+          metadata,
+        },
+      };
+
+      mockHttpClient.post.mockResolvedValue(response);
+
+      const result = await organizations.create(request);
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/organizations', request);
+      expect(result).toEqual(response);
+      expect(result.organization.metadata?.industry).toBe('Technology');
+      expect(result.organization.metadata?.employeeCount).toBe(150);
+      expect(result.organization.metadata?.isPremium).toBe(true);
+      expect(result.organization.metadata?.isVerified).toBe(false);
+      expect(result.organization.metadata?.foundedYear).toBe(2020);
+      expect(result.organization.metadata?.rating).toBe(4.5);
+      expect(result.organization.metadata?.customField).toBeNull();
+    });
+
+    it('should update organization with metadata containing various types', async () => {
+      const metadata: OrganizationMetadata = {
+        employeeCount: 200,
+        isPremium: true,
+        discount: 15.5,
+        notes: null,
+      };
+
+      const request: UpdateOrganizationRequest = {
+        metadata,
+      };
+
+      const response = { success: true };
+      mockHttpClient.patch.mockResolvedValue(response);
+
+      const result = await organizations.update('org_abc123', request);
+
+      expect(mockHttpClient.patch).toHaveBeenCalledWith(
+        '/api/v1/organizations/org_abc123',
+        request
+      );
+      expect(result).toEqual(response);
+    });
+
+    it('should handle metadata with boolean false values', async () => {
+      const metadata: OrganizationMetadata = {
+        isActive: false,
+        hasSubscription: false,
+        trialEnded: true,
+      };
+
+      const request: CreateOrganizationRequest = {
+        id: 'org_test123',
+        name: 'Test Corp',
+        domain: 'test.example.com',
+        metadata,
+      };
+
+      const response: CreateOrganizationResponse = {
+        success: true,
+        organization: {
+          id: 'org_test123',
+          name: 'Test Corp',
+          domain: 'test.example.com',
+          baseDN: 'o=test-corp,dc=example,dc=com',
+          status: 'active',
+          createdAt: new Date('2025-01-23T10:30:00Z'),
+          metadata,
+        },
+      };
+
+      mockHttpClient.post.mockResolvedValue(response);
+
+      const result = await organizations.create(request);
+
+      expect(result.organization.metadata?.isActive).toBe(false);
+      expect(result.organization.metadata?.hasSubscription).toBe(false);
+      expect(result.organization.metadata?.trialEnded).toBe(true);
+    });
+
+    it('should handle metadata with zero and negative numbers', async () => {
+      const metadata: OrganizationMetadata = {
+        balance: 0,
+        credits: -50,
+        temperature: -10.5,
+      };
+
+      const request: CreateOrganizationRequest = {
+        id: 'org_numbers',
+        name: 'Numbers Corp',
+        domain: 'numbers.example.com',
+        metadata,
+      };
+
+      const response: CreateOrganizationResponse = {
+        success: true,
+        organization: {
+          id: 'org_numbers',
+          name: 'Numbers Corp',
+          domain: 'numbers.example.com',
+          baseDN: 'o=numbers-corp,dc=example,dc=com',
+          status: 'active',
+          createdAt: new Date('2025-01-23T10:30:00Z'),
+          metadata,
+        },
+      };
+
+      mockHttpClient.post.mockResolvedValue(response);
+
+      const result = await organizations.create(request);
+
+      expect(result.organization.metadata?.balance).toBe(0);
+      expect(result.organization.metadata?.credits).toBe(-50);
+      expect(result.organization.metadata?.temperature).toBe(-10.5);
     });
   });
 
