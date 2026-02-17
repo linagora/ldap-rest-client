@@ -171,7 +171,7 @@ export class UsersResource extends BaseResource {
    * Returns organizations where the user is an admin or owner.
    * Optionally filter by specific role.
    *
-   * @param {string} userId - User identifier (username)
+   * @param {string} userId - User identifier (email address - unique identifier, not username)
    * @param {string} [role] - Optional role filter ('owner', 'admin', 'moderator', 'member')
    * @returns {Promise<Organization[]>} Array of organizations
    * @throws {ApiError} On API errors
@@ -179,10 +179,10 @@ export class UsersResource extends BaseResource {
    * @example
    * ```typescript
    * // Get all organizations where user has any role
-   * const orgs = await client.users.getUserOrganizations('johndoe');
+   * const orgs = await client.users.getUserOrganizations('user@example.com');
    *
    * // Get only organizations where user is owner
-   * const ownedOrgs = await client.users.getUserOrganizations('johndoe', 'owner');
+   * const ownedOrgs = await client.users.getUserOrganizations('user@example.com', 'owner');
    * ```
    */
   getUserOrganizations = async (userId: string, role?: string): Promise<Organization[]> => {
