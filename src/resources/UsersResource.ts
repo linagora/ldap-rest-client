@@ -75,6 +75,21 @@ export class UsersResource extends BaseResource {
   };
 
   /**
+   * Enables a previously disabled user account
+   *
+   * Removes pwdAccountLockedTime to unlock the account using LDAP PPolicy.
+   *
+   * @param {string} userId - User identifier (username)
+   * @returns {Promise<{ success: true }>} Success response
+   * @throws {NotFoundError} When user is not found
+   * @throws {ForbiddenError} When trying to enable a technical user
+   * @throws {ApiError} On other API errors
+   */
+  enable = async (userId: string): Promise<{ success: true }> => {
+    return this.http.post(`/api/v1/users/${encodeURIComponent(userId)}/enable`);
+  };
+
+  /**
    * Deletes a user
    *
    * Permanently removes the user from LDAP.
@@ -169,24 +184,17 @@ export class UsersResource extends BaseResource {
    * Gets organizations where a user has a role
    *
    * Returns organizations where the user is an admin or owner.
-   * Optionally filter by specific role.
    *
    * @param {string} userId - User identifier (email address - unique identifier, not username)
-   * @param {string} [role] - Optional role filter ('owner', 'admin', 'moderator', 'member')
    * @returns {Promise<Organization[]>} Array of organizations
    * @throws {ApiError} On API errors
    *
    * @example
    * ```typescript
-   * // Get all organizations where user has any role
    * const orgs = await client.users.getUserOrganizations('user@example.com');
-   *
-   * // Get only organizations where user is owner
-   * const ownedOrgs = await client.users.getUserOrganizations('user@example.com', 'owner');
    * ```
    */
-  getUserOrganizations = async (userId: string, role?: string): Promise<Organization[]> => {
-    const query = role ? this.buildQueryString({ role }) : '';
-    return this.http.get(`/api/v1/users/${encodeURIComponent(userId)}/organizations${query}`);
+  getUserOrganizations = async (userId: string): Promise<Organization[]> => {
+    return this.http.get(`/api/v1/users/${encodeURIComponent(userId)}/organizations`);
   };
 }

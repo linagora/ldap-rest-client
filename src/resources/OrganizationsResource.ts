@@ -373,6 +373,30 @@ export class OrganizationsResource extends BaseResource {
   };
 
   /**
+   * Enables a previously disabled user in an organization
+   *
+   * Removes pwdAccountLockedTime to unlock the account using LDAP PPolicy.
+   * Requires SSO cookie authentication and admin role.
+   *
+   * @param {string} organizationId - Organization identifier
+   * @param {string} userId - User identifier (username)
+   * @returns {Promise<{ success: true }>} Success response
+   * @throws {NotFoundError} When user or organization is not found
+   * @throws {ForbiddenError} When user lacks admin privileges or trying to enable a technical user
+   * @throws {ApiError} On other API errors
+   *
+   * @example
+   * ```typescript
+   * await client.organizations.enableUser('org_abc123', 'john.doe');
+   * ```
+   */
+  enableUser = async (organizationId: string, userId: string): Promise<{ success: true }> => {
+    return this.http.post(
+      `/api/v1/organizations/${encodeURIComponent(organizationId)}/users/${encodeURIComponent(userId)}/enable`
+    );
+  };
+
+  /**
    * Deletes a user from an organization
    *
    * Permanently removes the user from the organization's LDAP branch.
@@ -444,8 +468,6 @@ export class OrganizationsResource extends BaseResource {
    *   limit: 20,
    *   status: 'active',
    *   search: 'john',
-   *   sortBy: 'createdAt',
-   *   sortOrder: 'desc',
    * });
    *
    * // List only technical users
