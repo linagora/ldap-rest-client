@@ -242,7 +242,7 @@ export type UserStatus = 'active' | 'disabled';
 /**
  * Fields that can be used to search for users
  */
-export type UserSearchField = 'username' | 'phone' | 'email' | 'recoveryEmail';
+export type UserSearchField = 'username' | 'phone' | 'email' | 'recoveryEmail' | 'id';
 
 /**
  * Request payload for creating a new B2C user
@@ -354,10 +354,6 @@ export interface ListUsersParams {
   status?: UserStatus;
   /** Search by username, email, or name (min 2 characters) */
   search?: string;
-  /** Field to sort by ('username', 'createdAt', 'mail') */
-  sortBy?: string;
-  /** Sort order ('asc' or 'desc') */
-  sortOrder?: 'asc' | 'desc';
   /** Filter by technical account status (true: only technical users, undefined: only non-technical users) */
   isTechnical?: boolean;
   [key: string]: string | number | boolean | undefined;

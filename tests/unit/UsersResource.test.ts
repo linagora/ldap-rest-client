@@ -100,6 +100,29 @@ describe('UsersResource', () => {
     });
   });
 
+  describe('enable', () => {
+    it('should enable a user account', async () => {
+      const response = { success: true as const };
+      mockHttpClient.post.mockResolvedValue(response);
+
+      const result = await users.enable('johndoe');
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/users/johndoe/enable');
+      expect(result).toEqual(response);
+    });
+
+    it('should handle special characters in userId', async () => {
+      const response = { success: true as const };
+      mockHttpClient.post.mockResolvedValue(response);
+
+      await users.enable('john+doe@example.com');
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith(
+        '/api/v1/users/john%2Bdoe%40example.com/enable'
+      );
+    });
+  });
+
   describe('delete', () => {
     it('should delete a user', async () => {
       const response = { success: true as const };
@@ -312,27 +335,6 @@ describe('UsersResource', () => {
       expect(result).toEqual(response);
     });
 
-    it('should filter organizations by role', async () => {
-      const response: Organization[] = [
-        {
-          id: 'org_abc123',
-          name: 'Acme Corp',
-          domain: 'acme.example.com',
-          baseDN: 'o=acme-corp,dc=example,dc=com',
-          status: 'active',
-          createdAt: new Date('2025-01-23T10:30:00Z'),
-        },
-      ];
-      mockHttpClient.get.mockResolvedValue(response);
-
-      const result = await users.getUserOrganizations('john.doe', 'owner');
-
-      expect(mockHttpClient.get).toHaveBeenCalledWith(
-        '/api/v1/users/john.doe/organizations?role=owner'
-      );
-      expect(result).toEqual(response);
-    });
-
     it('should handle special characters in userId', async () => {
       const response: Organization[] = [];
       mockHttpClient.get.mockResolvedValue(response);
@@ -344,17 +346,14 @@ describe('UsersResource', () => {
       );
     });
 
-    it('should handle all valid roles', async () => {
-      const roles = ['owner', 'admin', 'moderator', 'member'];
+    it('should call correct endpoint without query params', async () => {
       mockHttpClient.get.mockResolvedValue([]);
 
-      for (const role of roles) {
-        await users.getUserOrganizations('john.doe', role);
+      await users.getUserOrganizations('john.doe');
 
-        expect(mockHttpClient.get).toHaveBeenCalledWith(
-          `/api/v1/users/john.doe/organizations?role=${role}`
-        );
-      }
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/users/john.doe/organizations'
+      );
     });
 
     it('should return empty array when user has no organizations', async () => {

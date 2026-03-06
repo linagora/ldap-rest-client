@@ -626,6 +626,20 @@ describe('OrganizationsResource', () => {
       });
     });
 
+    describe('enableUser', () => {
+      it('should enable user in organization', async () => {
+        const response = { success: true };
+        mockHttpClient.post.mockResolvedValue(response);
+
+        const result = await organizations.enableUser('org_abc123', 'john.doe');
+
+        expect(mockHttpClient.post).toHaveBeenCalledWith(
+          '/api/v1/organizations/org_abc123/users/john.doe/enable'
+        );
+        expect(result).toEqual(response);
+      });
+    });
+
     describe('deleteUser', () => {
       it('should delete user from organization', async () => {
         const response = { success: true };
@@ -736,12 +750,10 @@ describe('OrganizationsResource', () => {
           limit: 20,
           status: 'active',
           search: 'john',
-          sortBy: 'createdAt',
-          sortOrder: 'desc',
         });
 
         expect(mockHttpClient.get).toHaveBeenCalledWith(
-          '/api/v1/organizations/org_abc123/users?page=1&limit=20&status=active&search=john&sortBy=createdAt&sortOrder=desc'
+          '/api/v1/organizations/org_abc123/users?page=1&limit=20&status=active&search=john'
         );
         expect(result).toEqual(response);
       });
