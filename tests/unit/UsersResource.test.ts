@@ -351,9 +351,7 @@ describe('UsersResource', () => {
 
       await users.getUserOrganizations('john.doe');
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith(
-        '/api/v1/users/john.doe/organizations'
-      );
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/users/john.doe/organizations');
     });
 
     it('should return empty array when user has no organizations', async () => {
