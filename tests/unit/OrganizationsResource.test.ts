@@ -613,28 +613,30 @@ describe('OrganizationsResource', () => {
     });
 
     describe('disableUser', () => {
-      it('should disable user in organization', async () => {
+      it('should disable user in organization via PATCH /status', async () => {
         const response = { success: true };
-        mockHttpClient.post.mockResolvedValue(response);
+        mockHttpClient.patch.mockResolvedValue(response);
 
         const result = await organizations.disableUser('org_abc123', 'john.doe');
 
-        expect(mockHttpClient.post).toHaveBeenCalledWith(
-          '/api/v1/organizations/org_abc123/users/john.doe/disable'
+        expect(mockHttpClient.patch).toHaveBeenCalledWith(
+          '/api/v1/organizations/org_abc123/users/john.doe/status',
+          { enabled: false }
         );
         expect(result).toEqual(response);
       });
     });
 
     describe('enableUser', () => {
-      it('should enable user in organization', async () => {
+      it('should enable user in organization via PATCH /status', async () => {
         const response = { success: true };
-        mockHttpClient.post.mockResolvedValue(response);
+        mockHttpClient.patch.mockResolvedValue(response);
 
         const result = await organizations.enableUser('org_abc123', 'john.doe');
 
-        expect(mockHttpClient.post).toHaveBeenCalledWith(
-          '/api/v1/organizations/org_abc123/users/john.doe/enable'
+        expect(mockHttpClient.patch).toHaveBeenCalledWith(
+          '/api/v1/organizations/org_abc123/users/john.doe/status',
+          { enabled: true }
         );
         expect(result).toEqual(response);
       });

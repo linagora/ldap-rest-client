@@ -78,47 +78,53 @@ describe('UsersResource', () => {
   });
 
   describe('disable', () => {
-    it('should disable a user account', async () => {
+    it('should disable a user account via PATCH /status', async () => {
       const response = { success: true as const };
-      mockHttpClient.post.mockResolvedValue(response);
+      mockHttpClient.patch.mockResolvedValue(response);
 
       const result = await users.disable('johndoe');
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/users/johndoe/disable');
+      expect(mockHttpClient.patch).toHaveBeenCalledWith('/api/v1/users/johndoe/status', {
+        enabled: false,
+      });
       expect(result).toEqual(response);
     });
 
     it('should handle special characters in userId', async () => {
       const response = { success: true as const };
-      mockHttpClient.post.mockResolvedValue(response);
+      mockHttpClient.patch.mockResolvedValue(response);
 
       await users.disable('john+doe@example.com');
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith(
-        '/api/v1/users/john%2Bdoe%40example.com/disable'
+      expect(mockHttpClient.patch).toHaveBeenCalledWith(
+        '/api/v1/users/john%2Bdoe%40example.com/status',
+        { enabled: false }
       );
     });
   });
 
   describe('enable', () => {
-    it('should enable a user account', async () => {
+    it('should enable a user account via PATCH /status', async () => {
       const response = { success: true as const };
-      mockHttpClient.post.mockResolvedValue(response);
+      mockHttpClient.patch.mockResolvedValue(response);
 
       const result = await users.enable('johndoe');
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/users/johndoe/enable');
+      expect(mockHttpClient.patch).toHaveBeenCalledWith('/api/v1/users/johndoe/status', {
+        enabled: true,
+      });
       expect(result).toEqual(response);
     });
 
     it('should handle special characters in userId', async () => {
       const response = { success: true as const };
-      mockHttpClient.post.mockResolvedValue(response);
+      mockHttpClient.patch.mockResolvedValue(response);
 
       await users.enable('john+doe@example.com');
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith(
-        '/api/v1/users/john%2Bdoe%40example.com/enable'
+      expect(mockHttpClient.patch).toHaveBeenCalledWith(
+        '/api/v1/users/john%2Bdoe%40example.com/status',
+        { enabled: true }
       );
     });
   });
