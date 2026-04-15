@@ -71,7 +71,9 @@ export class UsersResource extends BaseResource {
    * @throws {ApiError} On other API errors
    */
   disable = async (userId: string): Promise<{ success: true }> => {
-    return this.http.post(`/api/v1/users/${encodeURIComponent(userId)}/disable`);
+    return this.http.patch(`/api/v1/users/${encodeURIComponent(userId)}/status`, {
+      enabled: false,
+    });
   };
 
   /**
@@ -86,7 +88,7 @@ export class UsersResource extends BaseResource {
    * @throws {ApiError} On other API errors
    */
   enable = async (userId: string): Promise<{ success: true }> => {
-    return this.http.post(`/api/v1/users/${encodeURIComponent(userId)}/enable`);
+    return this.http.patch(`/api/v1/users/${encodeURIComponent(userId)}/status`, { enabled: true });
   };
 
   /**

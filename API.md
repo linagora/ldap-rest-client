@@ -32,6 +32,7 @@ await client.users.create({
 ```
 
 **Technical accounts:**
+
 ```typescript
 await client.users.create({
   username: 'service-account',
@@ -53,6 +54,7 @@ await client.users.update('johndoe', {
 ```
 
 **Convert to technical account:**
+
 ```typescript
 await client.users.update('johndoe', {
   isTechnical: true,
@@ -61,10 +63,18 @@ await client.users.update('johndoe', {
 
 ### `disable(username)`
 
-Disable a B2C user account.
+Disable a B2C user account. Internally calls `PATCH /api/v1/users/:userId/status` with `{ enabled: false }`.
 
 ```typescript
 await client.users.disable('johndoe');
+```
+
+### `enable(username)`
+
+Re-enable a previously disabled B2C user account. Internally calls `PATCH /api/v1/users/:userId/status` with `{ enabled: true }`.
+
+```typescript
+await client.users.enable('johndoe');
 ```
 
 ### `delete(username)`
@@ -88,6 +98,7 @@ const available = await client.users.checkAvailability({
 ```
 
 **Parameters:**
+
 - `field`: `'username'` or `'mail'`
 - `value`: Value to check
 
@@ -110,6 +121,7 @@ const user = await client.users.fetch({
 ```
 
 **Parameters:**
+
 - `by`: `'username'` | `'email'` | `'phone'`
 - `value`: Value to search for
 - `fields` (optional): Comma-separated list of fields to return
@@ -140,6 +152,7 @@ const users = await client.users.search({
 ```
 
 **Parameters:**
+
 - `by`: `'username'` | `'email'` | `'phone'`
 - `value`: Value to search for
 - `fields` (optional): Comma-separated list of fields to return
@@ -159,6 +172,7 @@ const adminOrgs = await client.users.getUserOrganizations('user123', 'admin');
 ```
 
 **Parameters:**
+
 - `userId`: User identifier
 - `role` (optional): Filter by role (`'owner'` | `'admin'` | `'moderator'` | `'member'`)
 
@@ -181,6 +195,7 @@ await client.organizations.create({
 ```
 
 **Parameters:**
+
 - `id`: Organization identifier
 - `name`: Organization display name
 - `domain`: Organization domain
@@ -197,6 +212,7 @@ await client.organizations.createAdmin('acme-corp', {
 ```
 
 **Parameters:**
+
 - `orgId`: Organization identifier
 - `username`: Admin username
 - `mail`: Admin email
@@ -281,6 +297,7 @@ console.log(user.organizationId); // Organization ID
 ```
 
 **Technical accounts in organizations:**
+
 ```typescript
 const techUser = await client.organizations.createUser('acme-corp', {
   username: 'service-bot',
@@ -291,6 +308,7 @@ const techUser = await client.organizations.createUser('acme-corp', {
 ```
 
 **Invited users (pending invitation):**
+
 ```typescript
 const invitedUser = await client.organizations.createUser('acme-corp', {
   username: 'newuser',
@@ -307,17 +325,14 @@ const invitedUser = await client.organizations.createUser('acme-corp', {
 Update a user within an organization.
 
 ```typescript
-const updatedUser = await client.organizations.updateUser(
-  'acme-corp',
-  'user123',
-  {
-    mail: 'newemail@acme.com',
-    givenName: 'Jonathan',
-  }
-);
+const updatedUser = await client.organizations.updateUser('acme-corp', 'user123', {
+  mail: 'newemail@acme.com',
+  givenName: 'Jonathan',
+});
 ```
 
 **Convert to technical account:**
+
 ```typescript
 await client.organizations.updateUser('acme-corp', 'user123', {
   isTechnical: true,
@@ -325,6 +340,7 @@ await client.organizations.updateUser('acme-corp', 'user123', {
 ```
 
 **Update invitation status:**
+
 ```typescript
 await client.organizations.updateUser('acme-corp', 'user123', {
   invited: false, // Accept invitation
@@ -335,10 +351,18 @@ await client.organizations.updateUser('acme-corp', 'user123', {
 
 ### `disableUser(orgId, userId)`
 
-Disable a user within an organization.
+Disable a user within an organization. Internally calls `PATCH /api/v1/organizations/:orgId/users/:userId/status` with `{ enabled: false }`.
 
 ```typescript
 await client.organizations.disableUser('acme-corp', 'user123');
+```
+
+### `enableUser(orgId, userId)`
+
+Re-enable a previously disabled user within an organization. Internally calls `PATCH /api/v1/organizations/:orgId/users/:userId/status` with `{ enabled: true }`.
+
+```typescript
+await client.organizations.enableUser('acme-corp', 'user123');
 ```
 
 ### `deleteUser(orgId, userId)`
@@ -361,6 +385,7 @@ const user = await client.organizations.getUser('acme-corp', {
 ```
 
 **Parameters:**
+
 - `by`: `'username'` | `'email'` | `'id'`
 - `value`: Value to search for
 
@@ -385,6 +410,7 @@ const techUsers = await client.organizations.listUsers('acme-corp', {
 ```
 
 **Parameters:**
+
 - `page` (optional): Page number
 - `limit` (optional): Items per page
 - `status` (optional): Filter by status
@@ -405,6 +431,7 @@ const available = await client.organizations.checkUserAvailability('acme-corp', 
 ```
 
 **Parameters:**
+
 - `field`: `'username'` or `'mail'`
 - `value`: Value to check
 
@@ -421,6 +448,7 @@ console.log(`Changed from ${result.previousRole} to ${result.role}`);
 ```
 
 **Parameters:**
+
 - `role`: `'owner'` | `'admin'` | `'moderator'` | `'member'`
 
 **Returns:** `{ role: string, previousRole: string }`
@@ -456,6 +484,7 @@ const result = await client.groups.list('acme-corp', {
 ```
 
 **Parameters:**
+
 - `page` (optional): Page number
 - `limit` (optional): Items per page
 
@@ -497,6 +526,7 @@ await client.groups.addMembers('acme-corp', 'group123', {
 ```
 
 **Parameters:**
+
 - `usernames`: Array of usernames to add
 
 ### `removeMember(orgId, groupId, userId)`
@@ -556,11 +586,13 @@ const client = new LdapRestClient({
 ```
 
 **Configuration:**
+
 - `type`: Must be `'hmac'`
 - `serviceId`: Service identifier registered with LDAP-REST
 - `secret`: Shared secret key (minimum 32 characters recommended)
 
 **How it works:**
+
 1. Request body is hashed with SHA256
 2. Signing string is built: `METHOD|PATH|timestamp|body-hash`
 3. HMAC-SHA256 signature is computed
@@ -594,14 +626,14 @@ All errors extend the `LdapRestError` base class and map to specific HTTP status
 
 ```typescript
 import {
-  ValidationError,      // 400 - Invalid request data
-  AuthenticationError,  // 401 - Authentication failed
-  AuthorizationError,   // 403 - Insufficient permissions
-  NotFoundError,        // 404 - Resource not found
-  ConflictError,        // 409 - Resource already exists
-  RateLimitError,       // 429 - Rate limit exceeded
-  NetworkError,         // Network/timeout errors
-  ApiError,             // Other API errors
+  ValidationError, // 400 - Invalid request data
+  AuthenticationError, // 401 - Authentication failed
+  AuthorizationError, // 403 - Insufficient permissions
+  NotFoundError, // 404 - Resource not found
+  ConflictError, // 409 - Resource already exists
+  RateLimitError, // 429 - Rate limit exceeded
+  NetworkError, // Network/timeout errors
+  ApiError, // Other API errors
 } from '@linagora/ldap-rest-client';
 ```
 
@@ -632,6 +664,7 @@ try {
 ### Error Properties
 
 All error objects contain:
+
 - `message`: Human-readable error description
 - `statusCode`: HTTP status code (if applicable)
 - `errorCode`: API error code (if provided by server)

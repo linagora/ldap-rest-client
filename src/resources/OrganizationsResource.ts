@@ -367,8 +367,9 @@ export class OrganizationsResource extends BaseResource {
    * ```
    */
   disableUser = async (organizationId: string, userId: string): Promise<{ success: true }> => {
-    return this.http.post(
-      `/api/v1/organizations/${encodeURIComponent(organizationId)}/users/${encodeURIComponent(userId)}/disable`
+    return this.http.patch(
+      `/api/v1/organizations/${encodeURIComponent(organizationId)}/users/${encodeURIComponent(userId)}/status`,
+      { enabled: false }
     );
   };
 
@@ -391,8 +392,9 @@ export class OrganizationsResource extends BaseResource {
    * ```
    */
   enableUser = async (organizationId: string, userId: string): Promise<{ success: true }> => {
-    return this.http.post(
-      `/api/v1/organizations/${encodeURIComponent(organizationId)}/users/${encodeURIComponent(userId)}/enable`
+    return this.http.patch(
+      `/api/v1/organizations/${encodeURIComponent(organizationId)}/users/${encodeURIComponent(userId)}/status`,
+      { enabled: true }
     );
   };
 
