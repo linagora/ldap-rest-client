@@ -8,10 +8,11 @@ import type { Health } from '../models/Health';
  * service's aggregate status and per-dependency breakdown (currently only
  * LDAP backend reachability).
  *
- * Note: ldap-rest returns HTTP 503 with a fully-formed `Health` body when
- * the service is unhealthy. The HTTP client raises an error in that case;
- * callers that want to surface a "degraded/unhealthy" state without an
- * exception should catch and inspect.
+ * Note: ldap-rest returns HTTP 503 when the service cannot serve requests.
+ * The HTTP client maps that to `ApiError` and the structured `Health` body
+ * is not preserved on the thrown error - only `error`/`code` survive. To
+ * surface a `degraded` state without raising, rely on the 200-with-`degraded`
+ * response shape; to detect `unhealthy`, catch the `ApiError`.
  *
  * @example
  * ```typescript
@@ -27,7 +28,8 @@ export class HealthResource extends BaseResource {
    * Retrieves the current health status of the LDAP-REST service.
    *
    * @returns {Promise<Health>} Service health summary including dependency statuses
-   * @throws {ApiError} When the service is unhealthy (HTTP 503) or unreachable
+   * @throws {ApiError} When the service is unhealthy (HTTP 503) or returns a non-2xx
+   * @throws {NetworkError} When the request times out or the network fails
    */
   check = async (): Promise<Health> => {
     return this.http.get('/api/health');

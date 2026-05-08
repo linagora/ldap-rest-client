@@ -85,7 +85,9 @@ await client.groups.addMembers('acme-corp', group._id, {
 
 // Probe service health
 const health = await client.health.check();
-console.log(health.status, health.dependencies.ldap);
+if (health.status !== 'healthy') {
+  console.warn('LDAP-REST is', health.status, health.dependencies);
+}
 ```
 
 ## API Overview
