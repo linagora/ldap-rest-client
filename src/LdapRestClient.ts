@@ -2,7 +2,7 @@ import { ConfigValidator, type ClientConfig, type NormalizedClientConfig } from 
 import { HmacAuth, HttpClient } from './lib';
 import type { Auth } from './lib/Auth';
 import { Logger } from 'tslog';
-import { UsersResource, OrganizationsResource, GroupsResource } from './resources';
+import { UsersResource, OrganizationsResource, GroupsResource, HealthResource } from './resources';
 
 /**
  * LDAP-REST API Client
@@ -35,6 +35,7 @@ export class LdapRestClient {
   public readonly users: UsersResource;
   public readonly organizations: OrganizationsResource;
   public readonly groups: GroupsResource;
+  public readonly health: HealthResource;
   private readonly config: NormalizedClientConfig;
 
   /**
@@ -66,6 +67,7 @@ export class LdapRestClient {
     this.users = new UsersResource(http);
     this.organizations = new OrganizationsResource(http);
     this.groups = new GroupsResource(http);
+    this.health = new HealthResource(http);
   }
 
   /**
