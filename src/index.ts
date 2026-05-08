@@ -8,4 +8,4 @@ export { LdapRestClient } from './LdapRestClient';
 export type { ClientConfig } from './config';
 export * from './models';
 export * from './errors';
-export { UsersResource, OrganizationsResource, GroupsResource } from './resources';
+export { UsersResource, OrganizationsResource, GroupsResource, HealthResource } from './resources';

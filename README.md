@@ -82,15 +82,20 @@ const group = await client.groups.create('acme-corp', {
 await client.groups.addMembers('acme-corp', group._id, {
   usernames: ['user1', 'user2'],
 });
+
+// Probe service health
+const health = await client.health.check();
+console.log(health.status, health.dependencies.ldap);
 ```
 
 ## API Overview
 
-The client provides three main resource interfaces:
+The client provides four resource interfaces:
 
 - **`client.users`** - B2C user management (top-level users)
 - **`client.organizations`** - Organization and B2B user management
 - **`client.groups`** - Group management within organizations
+- **`client.health`** - Service health and dependency probes
 
 For complete API documentation, see **[API.md](./API.md)**.
 
