@@ -200,6 +200,10 @@ export interface User {
   isTechnical?: boolean;
   /** Whether this B2B user is pending invitation (only for B2B users) */
   invited?: boolean;
+  /** Account creation time (read-only, mapped from LDAP operational attribute `createTimestamp`, GeneralizedTime e.g. `20260508075429Z`) */
+  createTimestamp?: string;
+  /** Last modification time (read-only, mapped from LDAP operational attribute `modifyTimestamp`, GeneralizedTime e.g. `20260518202156Z`) */
+  modifyTimestamp?: string;
 }
 
 /**
