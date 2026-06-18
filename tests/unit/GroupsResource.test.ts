@@ -56,6 +56,35 @@ describe('GroupsResource', () => {
       expect(result).toEqual(response);
     });
 
+    it('should create a group with a color', async () => {
+      const request: CreateGroupRequest = {
+        name: 'engineering',
+        description: 'Engineering team',
+        color: '#3366FF',
+      };
+
+      const response: Group = {
+        id: 'engineering',
+        cn: 'engineering',
+        description: 'Engineering team',
+        color: '#3366FF',
+        organizationId: 'org_abc123',
+        baseDN: 'cn=engineering,o=acme-corp,dc=example,dc=com',
+        members: [],
+        createdAt: '2025-01-23T11:00:00Z',
+      };
+
+      mockHttpClient.post.mockResolvedValue(response);
+
+      const result = await groups.create('org_abc123', request);
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith(
+        '/api/v1/organizations/org_abc123/groups',
+        request
+      );
+      expect(result).toEqual(response);
+    });
+
     it('should create a group without description', async () => {
       const request: CreateGroupRequest = {
         name: 'sales',
@@ -172,6 +201,32 @@ describe('GroupsResource', () => {
       );
       expect(result).toEqual(response);
     });
+
+    it('should list groups with search and sorting params', async () => {
+      const response: ListGroupsResponse = {
+        organizationId: 'org_abc123',
+        groups: [],
+        pagination: {
+          page: 1,
+          limit: 20,
+          total: 0,
+          totalPages: 0,
+        },
+      };
+
+      mockHttpClient.get.mockResolvedValue(response);
+
+      const result = await groups.list('org_abc123', {
+        search: 'eng',
+        sortBy: 'cn',
+        sortOrder: 'desc',
+      });
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/organizations/org_abc123/groups?search=eng&sortBy=cn&sortOrder=desc'
+      );
+      expect(result).toEqual(response);
+    });
   });
 
   describe('get', () => {
@@ -234,9 +289,9 @@ describe('GroupsResource', () => {
       expect(result).toEqual(response);
     });
 
-    it('should update group name', async () => {
+    it('should update group color', async () => {
       const updates: UpdateGroupRequest = {
-        name: 'senior-engineering',
+        color: '#FF8800',
       };
 
       const response = { success: true };
@@ -251,10 +306,27 @@ describe('GroupsResource', () => {
       expect(result).toEqual(response);
     });
 
-    it('should update both name and description', async () => {
+    it('should update both description and color', async () => {
       const updates: UpdateGroupRequest = {
-        name: 'senior-engineering',
         description: 'Senior Engineering team',
+        color: '#3366FF',
+      };
+
+      const response = { success: true };
+      mockHttpClient.patch.mockResolvedValue(response);
+
+      const result = await groups.update('org_abc123', 'grp_xyz789', updates);
+
+      expect(mockHttpClient.patch).toHaveBeenCalledWith(
+        '/api/v1/organizations/org_abc123/groups/grp_xyz789',
+        updates
+      );
+      expect(result).toEqual(response);
+    });
+
+    it('should clear color with an empty string', async () => {
+      const updates: UpdateGroupRequest = {
+        color: '',
       };
 
       const response = { success: true };
@@ -472,9 +544,9 @@ describe('GroupsResource', () => {
       const error = new Error('Conflict');
       mockHttpClient.patch.mockRejectedValue(error);
 
-      await expect(groups.update('org_abc123', 'grp_xyz789', { name: 'new-name' })).rejects.toThrow(
-        'Conflict'
-      );
+      await expect(
+        groups.update('org_abc123', 'grp_xyz789', { description: 'new description' })
+      ).rejects.toThrow('Conflict');
     });
 
     it('should propagate errors from HTTP client on delete', async () => {

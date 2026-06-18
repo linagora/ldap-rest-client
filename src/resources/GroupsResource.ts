@@ -38,7 +38,7 @@ export class GroupsResource extends BaseResource {
    * Requires SSO cookie authentication and admin role in the target organization.
    *
    * @param {string} organizationId - Organization identifier
-   * @param {CreateGroupRequest} data - Group data (name and optional description)
+   * @param {CreateGroupRequest} data - Group data (name, optional description and color)
    * @returns {Promise<Group>} Created group object
    * @throws {ForbiddenError} When user lacks admin privileges
    * @throws {NotFoundError} When organization is not found
@@ -49,7 +49,8 @@ export class GroupsResource extends BaseResource {
    * ```typescript
    * const group = await client.groups.create('org_abc123', {
    *   name: 'engineering',
-   *   description: 'Engineering team'
+   *   description: 'Engineering team',
+   *   color: '#3366FF'
    * });
    * ```
    */
@@ -66,7 +67,7 @@ export class GroupsResource extends BaseResource {
    * Requires SSO cookie authentication and admin role.
    *
    * @param {string} organizationId - Organization identifier
-   * @param {ListGroupsParams} params - Pagination parameters (page, limit)
+   * @param {ListGroupsParams} params - Pagination, search, and sorting parameters
    * @returns {Promise<ListGroupsResponse>} Paginated list of groups
    * @throws {NotFoundError} When organization is not found
    * @throws {ForbiddenError} When user lacks admin privileges
@@ -76,7 +77,10 @@ export class GroupsResource extends BaseResource {
    * ```typescript
    * const result = await client.groups.list('org_abc123', {
    *   page: 1,
-   *   limit: 20
+   *   limit: 20,
+   *   search: 'eng',
+   *   sortBy: 'cn',
+   *   sortOrder: 'asc'
    * });
    * ```
    */
@@ -113,21 +117,23 @@ export class GroupsResource extends BaseResource {
   /**
    * Updates a group's properties
    *
-   * Requires SSO cookie authentication and admin role.
+   * Only `description` and `color` can be updated, and at least one must be
+   * provided. Renaming a group is not supported. Requires SSO cookie
+   * authentication and admin role.
    *
    * @param {string} organizationId - Organization identifier
    * @param {string} groupId - Group identifier
-   * @param {UpdateGroupRequest} data - Fields to update (name, description)
+   * @param {UpdateGroupRequest} data - Fields to update (description, color)
    * @returns {Promise<{ success: true }>} Success response
    * @throws {NotFoundError} When organization or group is not found
    * @throws {ForbiddenError} When user lacks admin privileges
-   * @throws {ConflictError} When new group name already exists
    * @throws {ApiError} On other API errors
    *
    * @example
    * ```typescript
    * await client.groups.update('org_abc123', 'grp_xyz789', {
-   *   description: 'Updated description'
+   *   description: 'Updated description',
+   *   color: '#FF8800'
    * });
    * ```
    */
