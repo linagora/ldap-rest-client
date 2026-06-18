@@ -11,6 +11,8 @@ export interface Group {
   cn: string;
   /** Group description */
   description?: string;
+  /** Optional display color as a hex code (e.g. #RRGGBB or #RGB); absent when not set */
+  color?: string;
   /** Organization ID this group belongs to */
   organizationId: string;
   /** LDAP base DN for this group */
@@ -25,20 +27,25 @@ export interface Group {
  * Request parameters for creating a group
  */
 export interface CreateGroupRequest {
-  /** Group common name (unique within organization) */
+  /** Group common name (unique within organization). Doubles as the group id/cn. */
   name: string;
   /** Optional group description */
   description?: string;
+  /** Optional display color as a hex code (e.g. #RRGGBB or #RGB) */
+  color?: string;
 }
 
 /**
  * Request parameters for updating a group
+ *
+ * Only `description` and `color` are updatable, and at least one must be
+ * provided. Renaming a group is not supported by the API.
  */
 export interface UpdateGroupRequest {
   /** Group description */
   description?: string;
-  /** Group common name */
-  name?: string;
+  /** Display color as a hex code (e.g. #RRGGBB or #RGB); pass an empty string to clear it */
+  color?: string;
 }
 
 /**
@@ -55,8 +62,14 @@ export interface AddGroupMembersRequest {
 export interface ListGroupsParams {
   /** Page number (default: 1) */
   page?: number;
-  /** Items per page (default: 20, max: 100) */
+  /** Items per page (default: 20, capped at the configured max) */
   limit?: number;
+  /** Substring match on name (cn) and description (min 2 characters) */
+  search?: string;
+  /** Field to sort by */
+  sortBy?: 'cn' | 'description' | 'createdAt';
+  /** Sort direction (default: asc) */
+  sortOrder?: 'asc' | 'desc';
   [key: string]: string | number | boolean | undefined;
 }
 

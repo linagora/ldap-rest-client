@@ -92,9 +92,10 @@ const result = await client.organizations.listUsers('acme-corp', {
 const group = await client.groups.create('acme-corp', {
   name: 'engineering',
   description: 'Engineering team',
+  color: '#3366FF',
 });
 
-await client.groups.addMembers('acme-corp', group._id, {
+await client.groups.addMembers('acme-corp', group.id, {
   usernames: ['user1', 'user2'],
 });
 

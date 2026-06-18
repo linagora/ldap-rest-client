@@ -465,10 +465,17 @@ Create a new group within an organization.
 const group = await client.groups.create('acme-corp', {
   name: 'engineering',
   description: 'Engineering team members',
+  color: '#3366FF',
 });
 
-console.log(group._id); // Group identifier
+console.log(group.id); // Group identifier (same as cn)
 ```
+
+**Parameters:**
+
+- `name`: Group name (also used as the group id/cn)
+- `description` (optional): Group description
+- `color` (optional): Display color as a hex code (`#RRGGBB` or `#RGB`)
 
 **Returns:** Group object.
 
@@ -480,6 +487,9 @@ List groups within an organization.
 const result = await client.groups.list('acme-corp', {
   page: 1,
   limit: 20,
+  search: 'eng',
+  sortBy: 'cn',
+  sortOrder: 'asc',
 });
 ```
 
@@ -487,6 +497,9 @@ const result = await client.groups.list('acme-corp', {
 
 - `page` (optional): Page number
 - `limit` (optional): Items per page
+- `search` (optional): Substring match on name (cn) and description (min 2 characters)
+- `sortBy` (optional): Sort field (`cn`, `description`, or `createdAt`)
+- `sortOrder` (optional): `asc` or `desc` (default `asc`)
 
 ### `get(orgId, groupId)`
 
@@ -498,12 +511,12 @@ const group = await client.groups.get('acme-corp', 'group123');
 
 ### `update(orgId, groupId, updates)`
 
-Update group details.
+Update group details. Only `description` and `color` can be updated, and at least one must be provided; renaming a group is not supported. Pass an empty-string `color` to clear it.
 
 ```typescript
 await client.groups.update('acme-corp', 'group123', {
-  name: 'engineering-team',
   description: 'Updated description',
+  color: '#FF8800',
 });
 ```
 
