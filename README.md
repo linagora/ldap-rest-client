@@ -57,6 +57,21 @@ const user = await client.organizations.createUser('acme-corp', {
   cn: 'Jane Smith',
   sn: 'Smith',
 });
+
+// SCIM 2.0 provisioning (generic; deployment-specific behaviour is supplied via
+// per-request headers, which are not part of the HMAC signature)
+import { SCIM_USER_SCHEMA } from '@linagora/ldap-rest-client';
+
+await client.scim.users.create(
+  {
+    schemas: [SCIM_USER_SCHEMA],
+    userName: 'jane.doe',
+    name: { familyName: 'Doe', givenName: 'Jane' },
+    emails: [{ value: 'jane.doe@acme.com', primary: true }],
+    active: true,
+  },
+  { 'x-scim-user-base': 'ou=users,ou=acme-corp,ou=b2b,dc=twake,dc=app' }
+);
 ```
 
 ### Browser (SSO Cookie)
@@ -92,12 +107,13 @@ if (health.status !== 'healthy') {
 
 ## API Overview
 
-The client provides four resource interfaces:
+The client provides five resource interfaces:
 
 - **`client.users`** - B2C user management (top-level users)
 - **`client.organizations`** - Organization and B2B user management
 - **`client.groups`** - Group management within organizations
 - **`client.health`** - Service health and dependency probes
+- **`client.scim`** - SCIM 2.0 provisioning (`client.scim.users`)
 
 For complete API documentation, see **[API.md](./API.md)**.
 

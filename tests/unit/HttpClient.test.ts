@@ -207,6 +207,22 @@ describe('HttpClient', () => {
       await expect(httpClient.get('/api/v1/test')).rejects.toThrow('Expected JSON response');
     });
 
+    it('should parse SCIM application/scim+json responses', async () => {
+      const body = { schemas: [], id: 'jane.doe', userName: 'jane.doe' };
+      const mockResponse = {
+        ok: true,
+        status: 201,
+        headers: new Headers({ 'content-type': 'application/scim+json;charset=utf-8' }),
+        json: jest.fn().mockResolvedValue(body),
+      };
+      mockFetch.mockResolvedValue(mockResponse);
+      mockAuth.sign.mockReturnValue('HMAC auth-header');
+
+      const result = await httpClient.post('/scim/v2/Users', { userName: 'jane.doe' });
+
+      expect(result).toEqual(body);
+    });
+
     it('should handle request timeout', async () => {
       jest.useFakeTimers();
 

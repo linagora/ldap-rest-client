@@ -37,6 +37,8 @@ export interface ClientConfig {
   auth?: AuthConfig;
   /** Request timeout in milliseconds (default: 30000) */
   timeout?: number;
+  /** SCIM endpoint prefix to match a non-default server `DM_SCIM_PREFIX` (default: '/scim/v2') */
+  scimPrefix?: string;
   /** tslog logger configuration for custom logging */
   logger?: ISettingsParam<unknown>;
 }
@@ -52,6 +54,8 @@ export interface NormalizedClientConfig {
   auth: AuthConfig;
   /** Request timeout in milliseconds */
   timeout: number;
+  /** SCIM endpoint prefix (undefined falls back to the resource default) */
+  scimPrefix?: string;
   /** tslog logger configuration */
   logger?: ISettingsParam<unknown>;
 }
@@ -118,6 +122,7 @@ export class ConfigValidator {
       baseUrl: config.baseUrl.replace(/\/$/, ''),
       auth: config.auth ?? { type: 'cookie' },
       timeout: config.timeout ?? 30000,
+      scimPrefix: config.scimPrefix,
       logger: config.logger,
     };
   }
