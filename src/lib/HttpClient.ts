@@ -159,7 +159,11 @@ export class HttpClient {
       }
 
       const contentType = response.headers.get('content-type');
-      if (!contentType?.includes('application/json')) {
+      // Accept both application/json and SCIM's application/scim+json.
+      if (
+        !contentType?.includes('application/json') &&
+        !contentType?.includes('application/scim+json')
+      ) {
         throw new ApiError('Expected JSON response', response.status, 'INVALID_RESPONSE');
       }
 
