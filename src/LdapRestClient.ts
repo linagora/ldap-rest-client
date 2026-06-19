@@ -8,6 +8,7 @@ import {
   GroupsResource,
   HealthResource,
   ScimResource,
+  ApplicativeAccountsResource,
 } from './resources';
 
 /**
@@ -43,6 +44,7 @@ export class LdapRestClient {
   public readonly groups: GroupsResource;
   public readonly health: HealthResource;
   public readonly scim: ScimResource;
+  public readonly applicativeAccounts: ApplicativeAccountsResource;
   private readonly config: NormalizedClientConfig;
 
   /**
@@ -76,6 +78,7 @@ export class LdapRestClient {
     this.groups = new GroupsResource(http);
     this.health = new HealthResource(http);
     this.scim = new ScimResource(http, this.config.scimPrefix);
+    this.applicativeAccounts = new ApplicativeAccountsResource(http);
   }
 
   /**
