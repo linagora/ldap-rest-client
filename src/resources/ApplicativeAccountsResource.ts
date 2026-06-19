@@ -78,10 +78,7 @@ export class ApplicativeAccountsResource extends BaseResource {
    * @returns {Promise<DeleteApplicativeAccountResponse>} The deleted account's uid
    * @throws {ApiError} When the uid does not belong to the user, or on other API errors
    */
-  delete = async (
-    username: string,
-    uid: string
-  ): Promise<DeleteApplicativeAccountResponse> => {
+  delete = async (username: string, uid: string): Promise<DeleteApplicativeAccountResponse> => {
     return this.http.delete(
       `/api/v1/users/${encodeURIComponent(username)}/app-accounts/${encodeURIComponent(uid)}`
     );
