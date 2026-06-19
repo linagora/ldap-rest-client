@@ -5,3 +5,4 @@ export * from './GroupsResource';
 export * from './HealthResource';
 export * from './ScimUsersResource';
 export * from './ScimResource';
+export * from './ApplicativeAccountsResource';

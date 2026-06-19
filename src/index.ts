@@ -15,5 +15,6 @@ export {
   HealthResource,
   ScimResource,
   ScimUsersResource,
+  ApplicativeAccountsResource,
   DEFAULT_SCIM_PREFIX,
 } from './resources';

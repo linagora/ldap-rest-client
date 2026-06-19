@@ -104,17 +104,24 @@ const health = await client.health.check();
 if (health.status !== 'healthy') {
   console.warn('LDAP-REST is', health.status, health.dependencies);
 }
+
+// Manage a user's per-device app accounts
+const accounts = await client.applicativeAccounts.list('johndoe');
+const created = await client.applicativeAccounts.create('johndoe', { name: 'Work laptop' });
+console.log('Store this once:', created.uid, created.pwd);
+await client.applicativeAccounts.delete('johndoe', created.uid);
 ```
 
 ## API Overview
 
-The client provides five resource interfaces:
+The client provides six resource interfaces:
 
 - **`client.users`** - B2C user management (top-level users)
 - **`client.organizations`** - Organization and B2B user management
 - **`client.groups`** - Group management within organizations
 - **`client.health`** - Service health and dependency probes
 - **`client.scim`** - SCIM 2.0 provisioning (`client.scim.users`)
+- **`client.applicativeAccounts`** - Per-device app accounts for protocol auth (IMAP, SMTP, CalDAV)
 
 For complete API documentation, see **[API.md](./API.md)**.
 

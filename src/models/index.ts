@@ -3,3 +3,4 @@ export * from './Organization';
 export * from './Group';
 export * from './Health';
 export * from './Scim';
+export * from './ApplicativeAccount';
