@@ -281,6 +281,29 @@ export class OrganizationsResource extends BaseResource {
     return this.http.delete(`/api/v1/organizations/${encodeURIComponent(organizationId)}`);
   };
 
+  /**
+   * Erases a deleted organization
+   *
+   * Permanently removes an organization that was already deleted, with its users
+   * and groups, from the directory. Can only be called by SaaS tools (with HMAC auth).
+   *
+   * @param {string} organizationId - Organization identifier
+   * @returns {Promise<{ success: true }>} Success response
+   * @throws {NotFoundError} When organization is not found
+   * @throws {AuthorizationError} When called on behalf of a user
+   * @throws {ConflictError} When the organization was not deleted first
+   * @throws {ApiError} On other API errors
+   *
+   * @example
+   * ```typescript
+   * await client.organizations.delete('org_abc123');
+   * await client.organizations.erase('org_abc123');
+   * ```
+   */
+  erase = async (organizationId: string): Promise<{ success: true }> => {
+    return this.http.post(`/api/v1/organizations/${encodeURIComponent(organizationId)}/erase`);
+  };
+
   // ===== B2B User Management Methods =====
 
   /**

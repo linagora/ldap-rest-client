@@ -980,4 +980,26 @@ describe('OrganizationsResource', () => {
       expect(mockHttpClient.delete).toHaveBeenCalledWith('/api/v1/organizations/org_test%2B123');
     });
   });
+
+  describe('erase', () => {
+    it('should erase organization', async () => {
+      const response = { success: true as const };
+      mockHttpClient.post.mockResolvedValue(response);
+
+      const result = await organizations.erase('org_abc123');
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/organizations/org_abc123/erase');
+      expect(result).toEqual(response);
+    });
+
+    it('should handle special characters in organizationId', async () => {
+      mockHttpClient.post.mockResolvedValue({ success: true as const });
+
+      await organizations.erase('org_test+123');
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith(
+        '/api/v1/organizations/org_test%2B123/erase'
+      );
+    });
+  });
 });
