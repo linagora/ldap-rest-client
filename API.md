@@ -274,6 +274,14 @@ await client.organizations.transferOwnership('acme-corp', {
 });
 ```
 
+### `erase(orgId)`
+
+Permanently remove an organization that was already deleted, with its users and groups. HMAC authentication only.
+
+```typescript
+await client.organizations.erase('acme-corp');
+```
+
 ## B2B Users
 
 B2B users belong to specific organizations. Managed via `client.organizations.*User()` methods.
