@@ -988,7 +988,10 @@ describe('OrganizationsResource', () => {
 
       const result = await organizations.erase('org_abc123');
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/organizations/org_abc123/erase');
+      expect(mockHttpClient.post).toHaveBeenCalledWith(
+        '/api/v1/organizations/org_abc123/erase',
+        {}
+      );
       expect(result).toEqual(response);
     });
 
@@ -998,7 +1001,8 @@ describe('OrganizationsResource', () => {
       await organizations.erase('org_test+123');
 
       expect(mockHttpClient.post).toHaveBeenCalledWith(
-        '/api/v1/organizations/org_test%2B123/erase'
+        '/api/v1/organizations/org_test%2B123/erase',
+        {}
       );
     });
   });

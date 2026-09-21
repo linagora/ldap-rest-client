@@ -301,7 +301,9 @@ export class OrganizationsResource extends BaseResource {
    * ```
    */
   erase = async (organizationId: string): Promise<{ success: true }> => {
-    return this.http.post(`/api/v1/organizations/${encodeURIComponent(organizationId)}/erase`);
+    // The server hashes an empty POST body as `{}`, so the signatures only match
+    // when `{}` is sent.
+    return this.http.post(`/api/v1/organizations/${encodeURIComponent(organizationId)}/erase`, {});
   };
 
   // ===== B2B User Management Methods =====
