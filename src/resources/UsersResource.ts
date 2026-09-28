@@ -7,6 +7,7 @@ import type {
   CheckAvailabilityParams,
   CheckAvailabilityResponse,
   SearchUsersParams,
+  SoftDeleteUserRequest,
 } from '../models';
 import type { Organization } from '../models/Organization';
 
@@ -89,6 +90,29 @@ export class UsersResource extends BaseResource {
    */
   enable = async (userId: string): Promise<{ success: true }> => {
     return this.http.patch(`/api/v1/users/${encodeURIComponent(userId)}/status`, { enabled: true });
+  };
+
+  /**
+   * Soft deletes a user
+   *
+   * Disables and locks the account and records when and why it was deleted.
+   * Deleting a deleted user again succeeds and keeps the original date and reason.
+   *
+   * @param {string} userId - User identifier (username)
+   * @param {SoftDeleteUserRequest} data - Why the user is deleted
+   * @returns {Promise<{ success: true }>} Success response
+   * @throws {ValidationError} When the reason code is not allowed
+   * @throws {AuthorizationError} When the user is a technical account
+   * @throws {NotFoundError} When user is not found
+   * @throws {ApiError} On other API errors
+   *
+   * @example
+   * ```typescript
+   * await client.users.softDelete('johndoe', { reasonCode: 'user_request' });
+   * ```
+   */
+  softDelete = async (userId: string, data: SoftDeleteUserRequest): Promise<{ success: true }> => {
+    return this.http.post(`/api/v1/users/${encodeURIComponent(userId)}/deletion`, data);
   };
 
   /**

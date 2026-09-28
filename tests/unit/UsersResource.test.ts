@@ -129,6 +129,31 @@ describe('UsersResource', () => {
     });
   });
 
+  describe('softDelete', () => {
+    it('should post the reason code to the deletion route', async () => {
+      const response = { success: true as const };
+      mockHttpClient.post.mockResolvedValue(response);
+
+      const result = await users.softDelete('johndoe', { reasonCode: 'violation' });
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/users/johndoe/deletion', {
+        reasonCode: 'violation',
+      });
+      expect(result).toEqual(response);
+    });
+
+    it('should handle special characters in userId', async () => {
+      mockHttpClient.post.mockResolvedValue({ success: true as const });
+
+      await users.softDelete('john+doe@example.com', { reasonCode: 'user_request' });
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith(
+        '/api/v1/users/john%2Bdoe%40example.com/deletion',
+        { reasonCode: 'user_request' }
+      );
+    });
+  });
+
   describe('delete', () => {
     it('should delete a user', async () => {
       const response = { success: true as const };

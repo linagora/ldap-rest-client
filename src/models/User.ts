@@ -200,6 +200,12 @@ export interface User {
   isTechnical?: boolean;
   /** Whether this B2B user is pending invitation (only for B2B users) */
   invited?: boolean;
+  /** Whether the user was soft deleted */
+  isDeleted?: boolean;
+  /** When the user was first deleted (ISO 8601) */
+  twakeDeletedAt?: string;
+  /** Why the user was first deleted */
+  twakeDeletionReason?: DeletionReason;
   /** Account creation time (read-only, mapped from LDAP operational attribute `createTimestamp`, GeneralizedTime e.g. `20260508075429Z`) */
   createTimestamp?: string;
   /** Last modification time (read-only, mapped from LDAP operational attribute `modifyTimestamp`, GeneralizedTime e.g. `20260518202156Z`) */
@@ -242,6 +248,24 @@ export interface UserKeys {
  * User account status
  */
 export type UserStatus = 'active' | 'disabled';
+
+/**
+ * Why a B2C user is deleted, as given to `users.softDelete`
+ */
+export type UserDeletionReason = 'user_request' | 'violation' | 'inactivity';
+
+/**
+ * Why a user was deleted, as recorded on the user: a B2C reason, or the B2B
+ * member or its organization being deleted
+ */
+export type DeletionReason = UserDeletionReason | 'member_deleted' | 'organization_deleted';
+
+/**
+ * Request body for soft deleting a B2C user
+ */
+export interface SoftDeleteUserRequest {
+  reasonCode: UserDeletionReason;
+}
 
 /**
  * Fields that can be used to search for users
