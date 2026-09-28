@@ -263,7 +263,8 @@ export class OrganizationsResource extends BaseResource {
   /**
    * Deletes an organization
    *
-   * Permanently removes the organization and all its data.
+   * Soft deletes the organization and every non-technical member. Deleting a
+   * deleted organization again succeeds. Use `erase` to remove it for good.
    * Can only be called by the organization owner or SaaS tools (with HMAC auth).
    *
    * @param {string} organizationId - Organization identifier
@@ -426,7 +427,8 @@ export class OrganizationsResource extends BaseResource {
   /**
    * Deletes a user from an organization
    *
-   * Permanently removes the user from the organization's LDAP branch.
+   * Soft deletes the user: disables the account and records when it was deleted.
+   * Deleting a deleted user again succeeds and keeps the original date.
    * Requires SSO cookie authentication and admin role.
    *
    * @param {string} organizationId - Organization identifier
