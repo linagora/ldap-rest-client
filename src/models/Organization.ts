@@ -13,10 +13,12 @@ export interface Organization {
   domain: string;
   /** LDAP base DN for this organization's branch (e.g., 'ou=org_abc123,dc=example,dc=com') */
   baseDN: string;
-  /** Organization status (active or suspended) */
+  /** Organization status */
   status: OrganizationStatus;
   /** Organization creation timestamp */
   createdAt: Date;
+  /** When the organization was deleted (ISO 8601), only when status is 'deleted' */
+  deletedAt?: string;
   /** Optional metadata for custom organization properties */
   metadata?: OrganizationMetadata;
 }
@@ -26,8 +28,9 @@ export interface Organization {
  *
  * - active: Organization is operational and users can authenticate
  * - suspended: Organization is temporarily disabled
+ * - deleted: Organization was deleted and can now only be erased
  */
-export type OrganizationStatus = 'active' | 'suspended';
+export type OrganizationStatus = 'active' | 'suspended' | 'deleted';
 
 /**
  * Supported primitive types for metadata values
@@ -84,8 +87,8 @@ export interface CreateAdminRequest {
 export interface UpdateOrganizationRequest {
   /** Organization display name */
   name?: string;
-  /** Organization status */
-  status?: OrganizationStatus;
+  /** Organization status; use `delete` to delete an organization */
+  status?: Exclude<OrganizationStatus, 'deleted'>;
   /** Optional metadata updates */
   metadata?: OrganizationMetadata;
 }
