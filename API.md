@@ -77,6 +77,14 @@ Re-enable a previously disabled B2C user account. Internally calls `PATCH /api/v
 await client.users.enable('johndoe');
 ```
 
+### `softDelete(username, { reasonCode })`
+
+Soft delete a B2C user: disable and lock the account, and record when and why it was deleted. `reasonCode` is one of `user_request`, `violation` or `inactivity`. Deleting a deleted user again keeps the original date and reason.
+
+```typescript
+await client.users.softDelete('johndoe', { reasonCode: 'user_request' });
+```
+
 ### `delete(username)`
 
 Permanently delete a B2C user.

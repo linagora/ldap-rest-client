@@ -244,6 +244,18 @@ export interface UserKeys {
 export type UserStatus = 'active' | 'disabled';
 
 /**
+ * Why a B2C user is deleted, as given to `users.softDelete`
+ */
+export type UserDeletionReason = 'user_request' | 'violation' | 'inactivity';
+
+/**
+ * Request body for soft deleting a B2C user
+ */
+export interface SoftDeleteUserRequest {
+  reasonCode: UserDeletionReason;
+}
+
+/**
  * Fields that can be used to search for users
  */
 export type UserSearchField = 'username' | 'phone' | 'email' | 'recoveryEmail' | 'id';
