@@ -40,7 +40,7 @@ describe('SpacesResource', () => {
 
     const result = await spaces.create('acme', request);
 
-    expect(mockHttpClient.post).toHaveBeenCalledWith(base, request);
+    expect(mockHttpClient.post).toHaveBeenCalledWith(base, request, undefined);
     expect(result).toEqual(space);
   });
 
@@ -70,8 +70,12 @@ describe('SpacesResource', () => {
     await spaces.delete('acme', space.id);
 
     expect(mockHttpClient.get).toHaveBeenCalledWith(`${base}/${space.id}`);
-    expect(mockHttpClient.patch).toHaveBeenCalledWith(`${base}/${space.id}`, { name: 'Design' });
-    expect(mockHttpClient.delete).toHaveBeenCalledWith(`${base}/${space.id}`);
+    expect(mockHttpClient.patch).toHaveBeenCalledWith(
+      `${base}/${space.id}`,
+      { name: 'Design' },
+      undefined
+    );
+    expect(mockHttpClient.delete).toHaveBeenCalledWith(`${base}/${space.id}`, undefined);
   });
 
   it('manages members', async () => {
@@ -86,14 +90,17 @@ describe('SpacesResource', () => {
     await spaces.removeMember('acme', 's1', 'jdoe');
 
     expect(mockHttpClient.get).toHaveBeenCalledWith(`${base}/s1/members?sortBy=role`);
-    expect(mockHttpClient.post).toHaveBeenCalledWith(`${base}/s1/members`, {
-      usernames: ['jdoe'],
-      role: 'editor',
-    });
-    expect(mockHttpClient.patch).toHaveBeenCalledWith(`${base}/s1/members/j%20doe`, {
-      role: 'viewer',
-    });
-    expect(mockHttpClient.delete).toHaveBeenCalledWith(`${base}/s1/members/jdoe`);
+    expect(mockHttpClient.post).toHaveBeenCalledWith(
+      `${base}/s1/members`,
+      { usernames: ['jdoe'], role: 'editor' },
+      undefined
+    );
+    expect(mockHttpClient.patch).toHaveBeenCalledWith(
+      `${base}/s1/members/j%20doe`,
+      { role: 'viewer' },
+      undefined
+    );
+    expect(mockHttpClient.delete).toHaveBeenCalledWith(`${base}/s1/members/jdoe`, undefined);
   });
 
   it('manages linked groups', async () => {
@@ -108,12 +115,17 @@ describe('SpacesResource', () => {
     await spaces.unlinkGroup('acme', 's1', 'g1');
 
     expect(mockHttpClient.get).toHaveBeenCalledWith(`${base}/s1/groups`);
-    expect(mockHttpClient.post).toHaveBeenCalledWith(`${base}/s1/groups`, {
-      groupIds: ['g1'],
-      role: 'viewer',
-    });
-    expect(mockHttpClient.patch).toHaveBeenCalledWith(`${base}/s1/groups/g1`, { role: 'editor' });
-    expect(mockHttpClient.delete).toHaveBeenCalledWith(`${base}/s1/groups/g1`);
+    expect(mockHttpClient.post).toHaveBeenCalledWith(
+      `${base}/s1/groups`,
+      { groupIds: ['g1'], role: 'viewer' },
+      undefined
+    );
+    expect(mockHttpClient.patch).toHaveBeenCalledWith(
+      `${base}/s1/groups/g1`,
+      { role: 'editor' },
+      undefined
+    );
+    expect(mockHttpClient.delete).toHaveBeenCalledWith(`${base}/s1/groups/g1`, undefined);
   });
 
   it('encodes the organization id', async () => {
@@ -122,5 +134,27 @@ describe('SpacesResource', () => {
     await spaces.get('a/b', 's1');
 
     expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/organizations/a%2Fb/spaces/s1');
+  });
+
+  it('sends the actor of a write as Auth-User', async () => {
+    mockHttpClient.post.mockResolvedValue(done);
+    mockHttpClient.delete.mockResolvedValue(done);
+
+    await spaces.addMembers(
+      'acme',
+      's1',
+      { usernames: ['jdoe'], role: 'editor' },
+      'jsmith@acme.com'
+    );
+    await spaces.delete('acme', 's1', 'jsmith@acme.com');
+
+    expect(mockHttpClient.post).toHaveBeenCalledWith(
+      `${base}/s1/members`,
+      { usernames: ['jdoe'], role: 'editor' },
+      { 'Auth-User': 'jsmith@acme.com' }
+    );
+    expect(mockHttpClient.delete).toHaveBeenCalledWith(`${base}/s1`, {
+      'Auth-User': 'jsmith@acme.com',
+    });
   });
 });

@@ -584,6 +584,8 @@ await client.spaces.rename('acme-corp', space.id, 'Design');
 await client.spaces.delete('acme-corp', space.id);
 ```
 
+Every write takes an optional last `actor` argument, the acting user's email, sent as `Auth-User`. When the service is listed in ldap-rest's `--workplace-actor-services`, the space events name that user instead of the service.
+
 Members:
 
 - `listMembers(orgId, spaceId, params)`: public profiles with their `role`, paginated, `sortBy` `uid`, `displayName`, `mail`, `jobTitle` or `role`

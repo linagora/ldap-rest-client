@@ -18,12 +18,16 @@ import type {
  * its users: a request that would remove the last one answers 409
  * `LAST_ADMIN`.
  *
+ * Every write takes an optional `actor`, sent as `Auth-User`: when the service
+ * is listed in ldap-rest's `--workplace-actor-services`, the space events name
+ * that user instead of the service.
+ *
  * @example
  * ```typescript
  * const space = await client.spaces.create('org_abc123', {
  *   name: 'Design Sprint',
  *   members: [{ username: 'jsmith', role: 'admin' }],
- * });
+ * }, 'jsmith@acme.com');
  *
  * await client.spaces.addMembers('org_abc123', space.id, {
  *   usernames: ['jdoe'],
@@ -38,14 +42,21 @@ export class SpacesResource extends BaseResource {
       ...rest.map(encodeURIComponent),
     ].join('/');
 
+  private as = (actor?: string): Record<string, string> | undefined =>
+    actor === undefined ? undefined : { 'Auth-User': actor };
+
   /**
    * Creates a space
    *
    * @throws {ValidationError} When `members` holds no admin (`ADMIN_REQUIRED`)
    * @throws {NotFoundError} When a user or group is not in the organization
    */
-  create = async (organizationId: string, data: CreateSpaceRequest): Promise<Space> => {
-    return this.http.post(this.path(organizationId), data);
+  create = async (
+    organizationId: string,
+    data: CreateSpaceRequest,
+    actor?: string
+  ): Promise<Space> => {
+    return this.http.post(this.path(organizationId), data, this.as(actor));
   };
 
   /**
@@ -72,16 +83,21 @@ export class SpacesResource extends BaseResource {
   rename = async (
     organizationId: string,
     spaceId: string,
-    name: string
+    name: string,
+    actor?: string
   ): Promise<{ success: true }> => {
-    return this.http.patch(this.path(organizationId, spaceId), { name });
+    return this.http.patch(this.path(organizationId, spaceId), { name }, this.as(actor));
   };
 
   /**
    * Deletes a space
    */
-  delete = async (organizationId: string, spaceId: string): Promise<{ success: true }> => {
-    return this.http.delete(this.path(organizationId, spaceId));
+  delete = async (
+    organizationId: string,
+    spaceId: string,
+    actor?: string
+  ): Promise<{ success: true }> => {
+    return this.http.delete(this.path(organizationId, spaceId), this.as(actor));
   };
 
   /**
@@ -104,9 +120,10 @@ export class SpacesResource extends BaseResource {
   addMembers = async (
     organizationId: string,
     spaceId: string,
-    data: { usernames: string[]; role: SpaceRole }
+    data: { usernames: string[]; role: SpaceRole },
+    actor?: string
   ): Promise<{ success: true }> => {
-    return this.http.post(this.path(organizationId, spaceId, 'members'), data);
+    return this.http.post(this.path(organizationId, spaceId, 'members'), data, this.as(actor));
   };
 
   /**
@@ -118,9 +135,14 @@ export class SpacesResource extends BaseResource {
     organizationId: string,
     spaceId: string,
     username: string,
-    role: SpaceRole
+    role: SpaceRole,
+    actor?: string
   ): Promise<{ success: true }> => {
-    return this.http.patch(this.path(organizationId, spaceId, 'members', username), { role });
+    return this.http.patch(
+      this.path(organizationId, spaceId, 'members', username),
+      { role },
+      this.as(actor)
+    );
   };
 
   /**
@@ -131,9 +153,13 @@ export class SpacesResource extends BaseResource {
   removeMember = async (
     organizationId: string,
     spaceId: string,
-    username: string
+    username: string,
+    actor?: string
   ): Promise<{ success: true }> => {
-    return this.http.delete(this.path(organizationId, spaceId, 'members', username));
+    return this.http.delete(
+      this.path(organizationId, spaceId, 'members', username),
+      this.as(actor)
+    );
   };
 
   /**
@@ -154,9 +180,10 @@ export class SpacesResource extends BaseResource {
   linkGroups = async (
     organizationId: string,
     spaceId: string,
-    data: { groupIds: string[]; role: SpaceRole }
+    data: { groupIds: string[]; role: SpaceRole },
+    actor?: string
   ): Promise<{ success: true }> => {
-    return this.http.post(this.path(organizationId, spaceId, 'groups'), data);
+    return this.http.post(this.path(organizationId, spaceId, 'groups'), data, this.as(actor));
   };
 
   /**
@@ -166,9 +193,14 @@ export class SpacesResource extends BaseResource {
     organizationId: string,
     spaceId: string,
     groupId: string,
-    role: SpaceRole
+    role: SpaceRole,
+    actor?: string
   ): Promise<{ success: true }> => {
-    return this.http.patch(this.path(organizationId, spaceId, 'groups', groupId), { role });
+    return this.http.patch(
+      this.path(organizationId, spaceId, 'groups', groupId),
+      { role },
+      this.as(actor)
+    );
   };
 
   /**
@@ -177,8 +209,9 @@ export class SpacesResource extends BaseResource {
   unlinkGroup = async (
     organizationId: string,
     spaceId: string,
-    groupId: string
+    groupId: string,
+    actor?: string
   ): Promise<{ success: true }> => {
-    return this.http.delete(this.path(organizationId, spaceId, 'groups', groupId));
+    return this.http.delete(this.path(organizationId, spaceId, 'groups', groupId), this.as(actor));
   };
 }
