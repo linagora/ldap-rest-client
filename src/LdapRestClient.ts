@@ -6,6 +6,7 @@ import {
   UsersResource,
   OrganizationsResource,
   GroupsResource,
+  SpacesResource,
   HealthResource,
   ScimResource,
   ApplicativeAccountsResource,
@@ -42,6 +43,7 @@ export class LdapRestClient {
   public readonly users: UsersResource;
   public readonly organizations: OrganizationsResource;
   public readonly groups: GroupsResource;
+  public readonly spaces: SpacesResource;
   public readonly health: HealthResource;
   public readonly scim: ScimResource;
   public readonly applicativeAccounts: ApplicativeAccountsResource;
@@ -76,6 +78,7 @@ export class LdapRestClient {
     this.users = new UsersResource(http);
     this.organizations = new OrganizationsResource(http);
     this.groups = new GroupsResource(http);
+    this.spaces = new SpacesResource(http);
     this.health = new HealthResource(http);
     this.scim = new ScimResource(http, this.config.scimPrefix);
     this.applicativeAccounts = new ApplicativeAccountsResource(http);

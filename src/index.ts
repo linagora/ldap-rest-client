@@ -12,6 +12,7 @@ export {
   UsersResource,
   OrganizationsResource,
   GroupsResource,
+  SpacesResource,
   HealthResource,
   ScimResource,
   ScimUsersResource,
