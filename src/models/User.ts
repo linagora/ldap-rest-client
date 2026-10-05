@@ -126,6 +126,8 @@ export interface UserName {
 export interface User {
   /** Unique user identifier (mapped from LDAP entryUUID) */
   _id?: string;
+  /** Username: the RDN value that group and space routes take */
+  uid: string;
   /** Common name (username) */
   cn: string;
   /** Surname or last name */
