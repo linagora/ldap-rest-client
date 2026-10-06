@@ -114,11 +114,12 @@ await client.applicativeAccounts.delete('johndoe', created.uid);
 
 ## API Overview
 
-The client provides six resource interfaces:
+The client provides seven resource interfaces:
 
 - **`client.users`** - B2C user management (top-level users)
 - **`client.organizations`** - Organization and B2B user management
 - **`client.groups`** - Group management within organizations
+- **`client.spaces`** - Spaces of an organization, their members and linked groups with roles
 - **`client.health`** - Service health and dependency probes
 - **`client.scim`** - SCIM 2.0 provisioning (`client.scim.users`)
 - **`client.applicativeAccounts`** - Per-device app accounts for protocol auth (IMAP, SMTP, CalDAV)
@@ -128,6 +129,7 @@ For complete API documentation, see **[API.md](./API.md)**.
 ### Key Concepts
 
 **Authentication:**
+
 - **HMAC-SHA256**: For server-to-server communication
 - **Cookie/SSO**: For browser-based applications
 
@@ -155,11 +157,7 @@ See **[API.md - Configuration](./API.md#configuration)** for detailed options.
 All errors extend `LdapRestError` and map to specific HTTP status codes:
 
 ```typescript
-import {
-  ValidationError,
-  NotFoundError,
-  ConflictError,
-} from '@linagora/ldap-rest-client';
+import { ValidationError, NotFoundError, ConflictError } from '@linagora/ldap-rest-client';
 
 try {
   await client.users.create(userData);

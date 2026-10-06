@@ -8,6 +8,7 @@ Complete API reference for the LDAP-REST client library.
 - [Organizations](#organizations)
 - [B2B Users](#b2b-users)
 - [Groups](#groups)
+- [Spaces](#spaces)
 - [Configuration](#configuration)
 - [Authentication](#authentication)
 - [Error Handling](#error-handling)
@@ -565,6 +566,39 @@ Remove a user from a group.
 ```typescript
 await client.groups.removeMember('acme-corp', 'group123', 'user123');
 ```
+
+## Spaces
+
+A space gathers users and groups of an organization, each with a role: `viewer`, `editor` or `admin`. A space keeps at least one admin among its users; a request that would remove the last one throws a `ConflictError` (`LAST_ADMIN`).
+
+```typescript
+const space = await client.spaces.create('acme-corp', {
+  name: 'Design Sprint',
+  members: [{ username: 'jsmith', role: 'admin' }],
+  groups: [{ id: 'group123', role: 'viewer' }],
+});
+
+const mine = await client.spaces.list('acme-corp', { user: 'jsmith' });
+await client.spaces.get('acme-corp', space.id);
+await client.spaces.rename('acme-corp', space.id, 'Design');
+await client.spaces.delete('acme-corp', space.id);
+```
+
+Every write takes an optional last `actor` argument, the acting user's email, sent as `Auth-User`. When the service is listed in ldap-rest's `--workplace-actor-services`, the space events name that user instead of the service.
+
+Members:
+
+- `listMembers(orgId, spaceId, params)`: public profiles with their `role`, paginated, `sortBy` `uid`, `displayName`, `mail`, `jobTitle` or `role`
+- `addMembers(orgId, spaceId, { usernames, role })`
+- `setMemberRole(orgId, spaceId, username, role)`
+- `removeMember(orgId, spaceId, username)`
+
+Linked groups:
+
+- `listGroups(orgId, spaceId)`
+- `linkGroups(orgId, spaceId, { groupIds, role })`
+- `setGroupRole(orgId, spaceId, groupId, role)`
+- `unlinkGroup(orgId, spaceId, groupId)`
 
 ## Configuration
 
