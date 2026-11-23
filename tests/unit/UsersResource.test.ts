@@ -486,6 +486,19 @@ describe('UsersResource', () => {
       expect(result).toEqual(response);
     });
 
+    it('should search users by workspace URL', async () => {
+      mockHttpClient.get.mockResolvedValue([]);
+
+      await users.search({
+        by: 'workspaceUrl',
+        value: 'https://john.example.com',
+      });
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/users/search?by=workspaceUrl&value=https%3A%2F%2Fjohn.example.com'
+      );
+    });
+
     it('should return empty array when no users match', async () => {
       mockHttpClient.get.mockResolvedValue([]);
 

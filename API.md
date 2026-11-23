@@ -158,11 +158,17 @@ const users = await client.users.search({
   value: '+1234567890',
   fields: 'cn,mail,username',
 });
+
+// Search by workspace URL (matched exactly as stored)
+const users = await client.users.search({
+  by: 'workspaceUrl',
+  value: 'https://john.example.com',
+});
 ```
 
 **Parameters:**
 
-- `by`: `'username'` | `'email'` | `'phone'`
+- `by`: `'username'` | `'email'` | `'phone'` | `'recoveryEmail'` | `'workspaceUrl'` | `'id'`
 - `value`: Value to search for
 - `fields` (optional): Comma-separated list of fields to return
 
