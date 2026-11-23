@@ -272,7 +272,13 @@ export interface SoftDeleteUserRequest {
 /**
  * Fields that can be used to search for users
  */
-export type UserSearchField = 'username' | 'phone' | 'email' | 'recoveryEmail' | 'id';
+export type UserSearchField =
+  | 'username'
+  | 'phone'
+  | 'email'
+  | 'recoveryEmail'
+  | 'workspaceUrl'
+  | 'id';
 
 /**
  * Request payload for creating a new B2C user
@@ -416,8 +422,8 @@ export type CreateB2BUserResponse = User;
  * Parameters for searching users across all branches
  */
 export interface SearchUsersParams {
-  /** Search field (username, email, phone, recoveryEmail) */
-  by: UserSearchField | 'recoveryEmail';
+  /** Search field */
+  by: UserSearchField;
   /** Search value */
   value: string;
   /** Optional comma-separated list of fields to return */
